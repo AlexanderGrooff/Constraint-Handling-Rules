@@ -1,9 +1,9 @@
 Rules seem to take this particular form:
 
-`(Name [@])? <(simplification | propagation | simpagation)> Pragma?`
+`(Rule [@])? Constraint+ Operator Guard? Body`
 
-Some things I noticed from the syntax:
+* Propagation: `A(N) ==> B(N)` results in `A(N)`, `B(N)`;
+* Simplification: `A(N) <=> B(N)` results in `A(N)`;
+* Simpagation: `A(N) \ B(N) <=> C(N)` results in `A(N)`, `C(N)` **Not sure about this one yet**.
 
-* When adding a rule like `A(N) ==> B(N)`, and a constraint A(1) is added, both A(1) and B(1) will be added to the store. This is propagation;
-* When adding a rule like `A(N) <=> B(N)`, and a constraint A(1) is added, only B(1) will be added to the store. This is simplification;
-
+Where `A(N)`, `B(N)` and `C(N)` are constraints.
