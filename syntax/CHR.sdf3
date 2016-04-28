@@ -17,7 +17,7 @@ context-free syntax
 
 	Rule.Simplification = {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
 	Rule.Propagation    = {CHRConstraint ","}+ "==>" Guard? {Constraint ","}+
-	Rule.Simpagation    = {CHRConstraint ","}+ "\\" {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
+	Rule.Simpagation    = {CHRConstraint ","}+ BackSlashChar {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
 
 	Guard = {BuiltInConstraint ","}+ "|"
 
