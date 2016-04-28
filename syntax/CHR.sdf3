@@ -1,0 +1,31 @@
+// Grammar for the CHR language
+
+module CHR
+
+imports 
+
+	Common
+	Exp
+
+context-free start-symbols
+
+	Start
+
+context-free syntax
+
+	Start = Rule+
+
+	Rule.Simplification = {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
+	Rule.Propagation    = {CHRConstraint ","}+ "==>" Guard? {Constraint ","}+
+	Rule.Simpagation    = {CHRConstraint ","}+ "\\" {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
+
+	Guard = {BuiltInConstraint ","}+ "|"
+
+	Constraint.BuiltIn = BuiltInConstraint
+	Constraint.CHR     = CHRConstraint
+
+	CHRConstraint      = <ID(<{Param ","}*>)>
+
+	BuiltInConstraint  = ExpBool
+
+	Param = Exp

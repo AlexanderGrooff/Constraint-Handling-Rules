@@ -1,0 +1,46 @@
+module Exp
+
+imports
+
+	Common
+
+context-free start-symbols
+
+	Exp
+	ExpBool
+
+context-free syntax
+
+	Exp.Int   = INT
+	Exp.Id    = ID
+
+	Exp.Plus  = Exp "+" Exp {left}
+	Exp.Minus = Exp "-" Exp {left}
+	Exp.Mult  = Exp "*" Exp
+
+	Exp       = <(<Exp>)> {bracket}
+
+	ExpBool.True  = <true>
+	ExpBool.False = <false>
+
+	ExpBool.Eq    = Exp "==" Exp
+	ExpBool.NEq   = Exp "!=" Exp
+	ExpBool.Lt    = Exp "<" Exp
+	ExpBool.Gt    = Exp ">" Exp
+	ExpBool.LtE   = Exp "<=" Exp
+	ExpBool.GtE   = Exp ">=" Exp
+
+	ExpBool.And   = Exp "&&" Exp
+	ExpBool.Or    = Exp "||" Exp
+	ExpBool.Not   = "!" Exp
+
+	ExpBool       = <(<ExpBool>)> {bracket}
+
+context-free priorities
+
+	{left: Exp.Mult}                                                                  >
+	{left: Exp.Plus Exp.Minus}                                                        >
+	{non-assoc: ExpBool.Eq ExpBool.NEq ExpBool.Lt ExpBool.Gt ExpBool.LtE ExpBool.GtE} >
+	{left: ExpBool.Not}                                                               >
+	{left: ExpBool.And}                                                               >
+	{left: ExpBool.Or}
