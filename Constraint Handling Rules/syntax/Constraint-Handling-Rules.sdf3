@@ -13,18 +13,20 @@ context-free syntax
 
 	Start = Rule+
 	
-	Rulename 			= ID "@"
+	Rulename            = ID "@"
 
 	Rule.Simplification = Rulename? {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
 	Rule.Propagation    = Rulename? {CHRConstraint ","}+ "==>" Guard? {Constraint ","}+
 	Rule.Simpagation    = Rulename? {CHRConstraint ","}+ BackSlashChar {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
 
-	Guard = {BuiltInConstraint ","}+ "|"
+	Guard               = {BuiltInConstraint ","}+ "|"
 
 	Constraint.BuiltIn = BuiltInConstraint
 	Constraint.CHR     = CHRConstraint
 
-	CHRConstraint      = <ID(<{Param ","}*>)>
+	CHRConstraint      = ID ConstraintParams?
+
+	ConstraintParams   = <(<{Param ","}*>)>
 
 	BuiltInConstraint  = ExpBool
 
