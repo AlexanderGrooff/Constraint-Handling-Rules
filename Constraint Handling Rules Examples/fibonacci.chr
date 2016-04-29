@@ -1,0 +1,11 @@
+/**
+ *
+ * Computes greatest common divisor by Euclidean algorithm.
+ *
+ * Example Usage:
+ *   gcd(12), gcd(8)
+ *
+ */
+
+cleanup @ gcd(0) <=> true
+gcd(N) \ gcd(M) <=> 0 < N, N <= M | gcd(M % N)

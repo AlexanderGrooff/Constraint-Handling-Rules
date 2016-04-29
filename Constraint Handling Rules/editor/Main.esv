@@ -7,7 +7,7 @@ imports
 
 language
 
-  extensions : con
+  extensions : chr
 
   provider : target/metaborg/stratego.ctree
   provider : target/metaborg/stratego-javastrat.jar
