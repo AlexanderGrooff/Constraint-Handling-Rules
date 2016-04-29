@@ -17,6 +17,7 @@ context-free syntax
 	Exp.Plus  = Exp "+" Exp {left}
 	Exp.Minus = Exp "-" Exp {left}
 	Exp.Mult  = Exp "*" Exp
+	Exp.Mod   = Exp "%" Exp
 
 	Exp       = <(<Exp>)> {bracket}
 
@@ -38,7 +39,7 @@ context-free syntax
 
 context-free priorities
 
-	{left: Exp.Mult}                                                                  >
+	{left: Exp.Mult Exp.Mod}                                                          >
 	{left: Exp.Plus Exp.Minus}                                                        >
 	{non-assoc: ExpBool.Eq ExpBool.NEq ExpBool.Lt ExpBool.Gt ExpBool.LtE ExpBool.GtE} >
 	{left: ExpBool.Not}                                                               >
