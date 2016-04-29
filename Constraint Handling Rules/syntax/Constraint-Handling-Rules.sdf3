@@ -17,7 +17,7 @@ context-free syntax
 
 	Rule.Simplification = Rulename? {Constraint ","}+ "<=>" Guard? {Constraint ","}+
 	Rule.Propagation    = Rulename? {Constraint ","}+ "==>" Guard? {Constraint ","}+
-	Rule.Simpagation    = Rulename? {Constraint ","}+ BackSlashChar {Constraint ","}+ "<=>" Guard? {Constraint ","}+
+	Rule.Simpagation    = Rulename? {Constraint ","}+ "\\" {Constraint ","}+ "<=>" Guard? {Constraint ","}+
 
 	Guard               = {BuiltInConstraint ","}+ "|"
 
