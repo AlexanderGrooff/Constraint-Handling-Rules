@@ -25,7 +25,7 @@ context-free syntax
 	ExpBool.False = <false>
 
 	ExpBool.Eq    = Exp "==" Exp
-	ExpBool.Eq    = Exp "===" Exp
+	ExpBool.TripleEq    = Exp "===" Exp
 	ExpBool.NEq   = Exp "!=" Exp
 	ExpBool.Lt    = Exp "<" Exp
 	ExpBool.Gt    = Exp ">" Exp
