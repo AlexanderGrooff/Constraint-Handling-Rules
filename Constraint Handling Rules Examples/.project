@@ -6,7 +6,13 @@
 		<project>Constraint Handling Rules</project>
 	</projects>
 	<buildSpec>
+		<buildCommand>
+			<name>org.metaborg.spoofax.eclipse.builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.metaborg.spoofax.eclipse.nature</nature>
 	</natures>
 </projectDescription>
