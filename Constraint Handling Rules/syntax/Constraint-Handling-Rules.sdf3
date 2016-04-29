@@ -13,11 +13,11 @@ context-free syntax
 
 	Start = Rule+
 	
-	Rulename            = ID "@"
+	Rulename.Rulename            = ID "@"
 
-	Rule.Simplification = Rulename? {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
-	Rule.Propagation    = Rulename? {CHRConstraint ","}+ "==>" Guard? {Constraint ","}+
-	Rule.Simpagation    = Rulename? {CHRConstraint ","}+ BackSlashChar {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
+	Rule.Simplification = Rulename? {Constraint ","}+ "<=>" Guard? {Constraint ","}+
+	Rule.Propagation    = Rulename? {Constraint ","}+ "==>" Guard? {Constraint ","}+
+	Rule.Simpagation    = Rulename? {Constraint ","}+ BackSlashChar {Constraint ","}+ "<=>" Guard? {Constraint ","}+
 
 	Guard               = {BuiltInConstraint ","}+ "|"
 
