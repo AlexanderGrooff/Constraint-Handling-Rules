@@ -1,0 +1,31 @@
+module Constraint-Handling-Rules
+
+imports 
+
+	Common
+	Exp
+
+context-free start-symbols
+
+	Start
+
+context-free syntax
+
+	Start = Rule+
+	
+	Rulename 			= ID "@"
+
+	Rule.Simplification = Rulename? {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
+	Rule.Propagation    = Rulename? {CHRConstraint ","}+ "==>" Guard? {Constraint ","}+
+	Rule.Simpagation    = Rulename? {CHRConstraint ","}+ BackSlashChar {CHRConstraint ","}+ "<=>" Guard? {Constraint ","}+
+
+	Guard = {BuiltInConstraint ","}+ "|"
+
+	Constraint.BuiltIn = BuiltInConstraint
+	Constraint.CHR     = CHRConstraint
+
+	CHRConstraint      = <ID(<{Param ","}*>)>
+
+	BuiltInConstraint  = ExpBool
+
+	Param = Exp
