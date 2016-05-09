@@ -11,32 +11,33 @@ context-free start-symbols
 
 context-free syntax
 
-	Exp.Int   = INT
-	Exp.Id    = ID
+	Exp.Int    = INT
+	Exp.String = STRING
+	Exp.Id     = ID
 
-	Exp.Plus  = Exp "+" Exp {left}
-	Exp.Minus = Exp "-" Exp {left}
-	Exp.Mult  = Exp "*" Exp
-	Exp.Mod   = Exp "%" Exp
+	Exp.Plus   = Exp "+" Exp {left}
+	Exp.Minus  = Exp "-" Exp {left}
+	Exp.Mult   = Exp "*" Exp
+	Exp.Mod    = Exp "%" Exp
 
-	Exp       = <(<Exp>)> {bracket}
+	Exp        = <(<Exp>)> {bracket}
 
-	ExpBool.True  = <true>
-	ExpBool.False = <false>
+	ExpBool.True     = <true>
+	ExpBool.False    = <false>
 
-	ExpBool.Eq    = Exp "==" Exp
-	ExpBool.TripleEq    = Exp "===" Exp
-	ExpBool.NEq   = Exp "!=" Exp
-	ExpBool.Lt    = Exp "<" Exp
-	ExpBool.Gt    = Exp ">" Exp
-	ExpBool.LtE   = Exp "<=" Exp
-	ExpBool.GtE   = Exp ">=" Exp
+	ExpBool.Eq       = Exp "==" Exp
+	ExpBool.TripleEq = Exp "===" Exp
+	ExpBool.NEq      = Exp "!=" Exp
+	ExpBool.Lt       = Exp "<" Exp
+	ExpBool.Gt       = Exp ">" Exp
+	ExpBool.LtE      = Exp "<=" Exp
+	ExpBool.GtE      = Exp ">=" Exp
 
-	ExpBool.And   = Exp "&&" Exp
-	ExpBool.Or    = Exp "||" Exp
-	ExpBool.Not   = "!" Exp
+	ExpBool.And      = Exp "&&" Exp
+	ExpBool.Or       = Exp "||" Exp
+	ExpBool.Not      = "!" Exp
 
-	ExpBool       = <(<ExpBool>)> {bracket}
+	ExpBool          = <(<ExpBool>)> {bracket}
 
 context-free priorities
 

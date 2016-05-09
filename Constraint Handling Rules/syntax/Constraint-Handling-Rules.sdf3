@@ -25,9 +25,10 @@ context-free syntax
 	Constraint.BuiltIn  = BuiltInConstraint
 	Constraint.CHR      = CHRConstraint
 
-	CHRConstraint.CHRConstraint      = ID
-	CHRConstraint.CHRConstraintParentheses      = <<ID> (<{Param ","}*>)>
+	CHRConstraint.CHRConstraint            = ID
+	CHRConstraint.CHRConstraintParentheses = <<ID> (<{Param ","}*>)>
 
-	BuiltInConstraint  = ExpBool
+	BuiltInConstraint.BoolExp = ExpBool
+	BuiltInConstraint.Fail    = <fail>
 
 	Param = Exp

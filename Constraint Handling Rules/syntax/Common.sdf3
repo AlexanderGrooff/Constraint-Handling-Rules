@@ -6,12 +6,16 @@ lexical syntax
 	ID             = [a-zA-Z] [a-zA-Z0-9]* 
 	INT            = "-"? [0-9]+ 
 	STRING         = "\"" StringChar* "\"" 
+	STRING         = "'" StringChar2* "'" 
 	StringChar     = ~[\"\n] 
 	StringChar     = "\\\"" 
 	StringChar     = BackSlashChar 
+	StringChar2    = "\\\"" 
+	StringChar2    = BackSlashChar 
 	BackSlashChar  = "\\" 
 	ReservedWord   = "true"
 	ReservedWord   = "false"
+	ReservedWord   = "fail"
 	LAYOUT         = [\ \t\n\r] 
 	CommentChar    = [\*] 
 	LAYOUT         = "/*" InsideComment* "*/" 
