@@ -7,24 +7,34 @@ signature
 	sorts
 		Operator Exp
 	constructors
-		BinOp		: Operator * Exp * Exp -> Exp
-		UnOp		: Operator * Exp -> Exp
-		PlusOp		: Operator
-		MinusOp		: Operator
-		TimesOp		: Operator
-		DivideOp	: Operator
-		ModOp		: Operator
-		LessThanOp	: Operator
-		AndOp		: Operator
-		OrOp		: Operator
-		NotOp		: Operator
+		BinOp				: Operator * Exp * Exp -> Exp
+		UnOp				: Operator * Exp -> Exp
+		PlusOp				: Operator
+		MinusOp				: Operator
+		TimesOp				: Operator
+		DivideOp			: Operator
+		ModOp				: Operator
+		EqualOp				: Operator
+		NotEqualOp			: Operator
+		LessThanOp			: Operator
+		GreaterThanOp		: Operator
+		LessThanEqualOp		: Operator
+		GreaterThanEqualOp	: Operator
+		AndOp				: Operator
+		OrOp				: Operator
+		NotOp				: Operator
 rules
 	desugar: Plus(e1, e2) -> BinOp(PlusOp(), e1, e2)
 	desugar: Minus(e1, e2) -> BinOp(MinusOp(), e1, e2)
 	desugar: Mult(e1, e2) -> BinOp(TimesOp(), e1, e2)
 	desugar: Divide(e1, e2) -> BinOp(DivideOp(), e1, e2)
 	desugar: Mod(e1, e2) -> BinOp(ModOp(), e1, e2)
+	desugar: Eq(e1, e2)  -> BinOp(EqualOp(), e1, e2)
+	desugar: NEq(e1, e2)  -> BinOp(NotEqualOp(), e1, e2)
 	desugar: Lt(e1, e2)  -> BinOp(LessThanOp(), e1, e2)
+	desugar: Gt(e1, e2)  -> BinOp(GreaterThanOp(), e1, e2)
+	desugar: LtE(e1, e2)  -> BinOp(LessThanEqualOp(), e1, e2)
+	desugar: GtE(e1, e2)  -> BinOp(GreaterThanEqualOp(), e1, e2)
 	desugar: And(e1, e2) -> BinOp(AndOp(), e1, e2)
 	desugar: Or(e1, e2) -> BinOp(OrOp(), e1, e2)
 	desugar: Not(e) -> UnOp(NotOp(), e)
