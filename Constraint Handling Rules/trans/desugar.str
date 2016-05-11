@@ -28,6 +28,9 @@ rules
 	desugar: And(e1, e2) -> BinOp(AndOp(), e1, e2)
 	desugar: Or(e1, e2) -> BinOp(OrOp(), e1, e2)
 	desugar: Not(e) -> UnOp(NotOp(), e)
+	
+	desugar: Simpagation(rule, constrs*, constrs2*, guard, out*) -> Simplification(rule, [constrs*, constrs2*], guard, [constrs*, out*])
+	desugar: Propagation(rule, constrs*, guard, out*) -> Simplification(rule, constrs*, guard, [constrs*, out*])
    
 strategies
 
