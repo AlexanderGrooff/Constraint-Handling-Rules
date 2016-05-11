@@ -18,6 +18,7 @@ context-free syntax
 	Exp.Plus   = Exp "+" Exp {left}
 	Exp.Minus  = Exp "-" Exp {left}
 	Exp.Mult   = Exp "*" Exp
+	Exp.Divide = Exp "/" Exp
 	Exp.Mod    = Exp "%" Exp
 
 	Exp        = <(<Exp>)> {bracket}
@@ -33,9 +34,9 @@ context-free syntax
 	ExpBool.LtE      = Exp "<=" Exp
 	ExpBool.GtE      = Exp ">=" Exp
 
-	ExpBool.And      = Exp "&&" Exp
-	ExpBool.Or       = Exp "||" Exp
-	ExpBool.Not      = "!" Exp
+	ExpBool.And      = ExpBool "&&" ExpBool
+	ExpBool.Or       = ExpBool "||" ExpBool
+	ExpBool.Not      = "!" ExpBool
 
 	ExpBool          = <(<ExpBool>)> {bracket}
 

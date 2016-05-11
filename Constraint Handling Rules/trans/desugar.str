@@ -12,15 +12,22 @@ signature
 		PlusOp		: Operator
 		MinusOp		: Operator
 		TimesOp		: Operator
+		DivideOp	: Operator
+		ModOp		: Operator
 		LessThanOp	: Operator
 		AndOp		: Operator
+		OrOp		: Operator
 		NotOp		: Operator
 rules
 	desugar: Plus(e1, e2) -> BinOp(PlusOp(), e1, e2)
 	desugar: Minus(e1, e2) -> BinOp(MinusOp(), e1, e2)
 	desugar: Mult(e1, e2) -> BinOp(TimesOp(), e1, e2)
+	desugar: Divide(e1, e2) -> BinOp(DivideOp(), e1, e2)
+	desugar: Mod(e1, e2) -> BinOp(ModOp(), e1, e2)
 	desugar: Lt(e1, e2)  -> BinOp(LessThanOp(), e1, e2)
 	desugar: And(e1, e2) -> BinOp(AndOp(), e1, e2)
+	desugar: Or(e1, e2) -> BinOp(OrOp(), e1, e2)
+	desugar: Not(e) -> UnOp(NotOp(), e)
    
 strategies
 
