@@ -21,10 +21,9 @@ context-free syntax
 	Exp.Divide = Exp "/" Exp
 	Exp.Mod    = Exp "%" Exp
 
-	Exp        = <(<Exp>)> {bracket}
-
 	Exp.True     = <true>
 	Exp.False    = <false>
+	Exp.Fail     = <fail>
 
 	Exp.Eq       = Exp "==" Exp
 	Exp.TripleEq = Exp "===" Exp
@@ -38,11 +37,13 @@ context-free syntax
 	Exp.Or       = Exp "||" Exp
 	Exp.Not      = "!" Exp
 
+	Exp        = <(<Exp>)> {bracket}
+
 context-free priorities
 
-	{left: Exp.Mult Exp.Mod}                                                          >
-	{left: Exp.Plus Exp.Minus}                                                        >
+	{left: Exp.Mult Exp.Mod} >
+	{left: Exp.Plus Exp.Minus} >
 	{non-assoc: Exp.Eq Exp.NEq Exp.Lt Exp.Gt Exp.LtE Exp.GtE} >
-	{left: Exp.Not}                                                               >
-	{left: Exp.And}                                                               >
+	{left: Exp.Not} >
+	{left: Exp.And} >
 	{left: Exp.Or}

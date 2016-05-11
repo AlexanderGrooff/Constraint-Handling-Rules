@@ -28,7 +28,6 @@ context-free syntax
 	CHRConstraint.CHRConstraint            = ID
 	CHRConstraint.CHRConstraintParentheses = <<ID> (<{Param ","}*>)>
 
-	BuiltInConstraint.BoolExp = Exp
-	BuiltInConstraint.Fail    = <fail>
+	BuiltInConstraint = Exp
 
 	Param = Exp
