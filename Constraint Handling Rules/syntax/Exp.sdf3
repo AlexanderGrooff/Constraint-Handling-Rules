@@ -7,7 +7,7 @@ imports
 context-free start-symbols
 
 	Exp
-	ExpBool
+	Exp
 
 context-free syntax
 
@@ -23,28 +23,26 @@ context-free syntax
 
 	Exp        = <(<Exp>)> {bracket}
 
-	ExpBool.True     = <true>
-	ExpBool.False    = <false>
+	Exp.True     = <true>
+	Exp.False    = <false>
 
-	ExpBool.Eq       = Exp "==" Exp
-	ExpBool.TripleEq = Exp "===" Exp
-	ExpBool.NEq      = Exp "!=" Exp
-	ExpBool.Lt       = Exp "<" Exp
-	ExpBool.Gt       = Exp ">" Exp
-	ExpBool.LtE      = Exp "<=" Exp
-	ExpBool.GtE      = Exp ">=" Exp
+	Exp.Eq       = Exp "==" Exp
+	Exp.TripleEq = Exp "===" Exp
+	Exp.NEq      = Exp "!=" Exp
+	Exp.Lt       = Exp "<" Exp
+	Exp.Gt       = Exp ">" Exp
+	Exp.LtE      = Exp "<=" Exp
+	Exp.GtE      = Exp ">=" Exp
 
-	ExpBool.And      = ExpBool "&&" ExpBool
-	ExpBool.Or       = ExpBool "||" ExpBool
-	ExpBool.Not      = "!" ExpBool
-
-	ExpBool          = <(<ExpBool>)> {bracket}
+	Exp.And      = Exp "&&" Exp
+	Exp.Or       = Exp "||" Exp
+	Exp.Not      = "!" Exp
 
 context-free priorities
 
 	{left: Exp.Mult Exp.Mod}                                                          >
 	{left: Exp.Plus Exp.Minus}                                                        >
-	{non-assoc: ExpBool.Eq ExpBool.NEq ExpBool.Lt ExpBool.Gt ExpBool.LtE ExpBool.GtE} >
-	{left: ExpBool.Not}                                                               >
-	{left: ExpBool.And}                                                               >
-	{left: ExpBool.Or}
+	{non-assoc: Exp.Eq Exp.NEq Exp.Lt Exp.Gt Exp.LtE Exp.GtE} >
+	{left: Exp.Not}                                                               >
+	{left: Exp.And}                                                               >
+	{left: Exp.Or}
