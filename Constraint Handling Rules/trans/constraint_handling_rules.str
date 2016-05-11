@@ -2,10 +2,21 @@ module constraint_handling_rules
 
 imports
   
+  libstratego-lib
+  libstratego-gpp
+  libstratego-aterm
   completion
   pp
   outline
   analysis
+  desugar
+
+rules // Editor services
+	editor-desugar:
+	  	(selected, position, ast, path, project-path) -> (filename, text)
+	  	where
+	    	filename := <guarantee-extension(|"desugared.aterm")> path ;
+	    	text     := <desugar> selected
 
 rules // Debugging
   

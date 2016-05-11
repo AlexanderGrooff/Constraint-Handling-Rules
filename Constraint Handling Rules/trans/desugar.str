@@ -9,17 +9,17 @@ signature
 	constructors
 		BinOp		: Operator * Exp * Exp -> Exp
 		UnOp		: Operator * Exp -> Exp
-		Plus		: Operator
-		Minus		: Operator
-		Times		: Operator
-		LessThan	: Operator
+		PlusOp		: Operator
+		MinusOp		: Operator
+		TimesOp		: Operator
+		LessThanOp	: Operator
 		AndOp		: Operator
 		NotOp		: Operator
 rules
-	desugar: Add(e1, e2) -> BinOp(Plus(), e1, e2)
-	desugar: Sub(e1, e2) -> BinOp(Minus(), e1, e2)
-	desugar: Mul(e1, e2) -> BinOp(Times(), e1, e2)
-	desugar: Lt(e1, e2)  -> BinOp(LessThan(), e1, e2)
+	desugar: Plus(e1, e2) -> BinOp(PlusOp(), e1, e2)
+	desugar: Minus(e1, e2) -> BinOp(MinusOp(), e1, e2)
+	desugar: Mult(e1, e2) -> BinOp(TimesOp(), e1, e2)
+	desugar: Lt(e1, e2)  -> BinOp(LessThanOp(), e1, e2)
 	desugar: And(e1, e2) -> BinOp(AndOp(), e1, e2)
    
 strategies
