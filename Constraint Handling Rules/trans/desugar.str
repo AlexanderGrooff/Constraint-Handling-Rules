@@ -41,6 +41,8 @@ rules
 	
 	desugar: Simpagation(rule, constrs*, constrs2*, guard, out*) -> Simplification(rule, [constrs*, constrs2*], guard, [constrs*, out*])
 	desugar: Propagation(rule, constrs*, guard, out*) -> Simplification(rule, constrs*, guard, [constrs*, out*])
+	
+	desugar: Noguard() -> Guard(True())
    
 strategies
 
