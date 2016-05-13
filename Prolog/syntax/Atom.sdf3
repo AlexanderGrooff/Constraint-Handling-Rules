@@ -7,6 +7,6 @@ context-free start-symbols
 context-free syntax
 	Atom.Var = ID
 	Atom.Number = INT
-	Atom.Float = INT"."INT
+	Atom.Float = FLOAT
 	Atom.List = [{Atom ", "}+]
 	Atom.CompoundTerm = ID"("{Atom ","}*")"
