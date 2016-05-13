@@ -13,5 +13,5 @@ context-free syntax
   
   	Start = Statement+ Query
 	Statement.Rule = Atom ":-" Atom "."
-	Statement.Fact = <Name(Arg).>
+	Statement.Fact = Atom "."
 	Query.Query = "?-" Statement "."

@@ -1,0 +1,3 @@
+( [Rule(CompoundTerm("cat", [Var("tom")]), Var("true"))]
+, Query(Fact(CompoundTerm("cat", [Var("x")])))
+)
