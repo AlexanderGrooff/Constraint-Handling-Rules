@@ -7,7 +7,6 @@ imports
 context-free start-symbols
 
 	Exp
-	Exp
 
 context-free syntax
 
