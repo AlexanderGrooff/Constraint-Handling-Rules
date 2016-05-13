@@ -1,0 +1,12 @@
+module Atom
+
+imports 
+	Common
+context-free start-symbols
+	Atom
+context-free syntax
+	Atom.Var = ID
+	Atom.Number = INT
+	Atom.Float = INT"."INT
+	Atom.List = [{Atom ", "}+]
+	Atom.CompoundTerm = ID"("{Atom ","}*")"

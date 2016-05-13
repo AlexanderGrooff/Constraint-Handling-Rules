@@ -2,6 +2,7 @@ module Prolog
 
 imports
   
+  Atom
   Common
 
 context-free start-symbols
@@ -10,4 +11,7 @@ context-free start-symbols
 
 context-free syntax
   
-  Start.Empty = <>
+  	Start = Statement+ Query
+	Statement.Rule = Atom ":-" Atom "."
+	Statement.Fact = <Name(Arg).>
+	Query.Query = "?-" Statement "."
