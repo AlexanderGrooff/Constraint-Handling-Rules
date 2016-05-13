@@ -13,13 +13,12 @@ context-free syntax
 
 	Start = <
 rules:
-	<Rules>
+	<{Rule "\n"}+>
 
 store:
 	<Store>
 >
 
-	Rules = Rule+
 	Store = CHRConstraint+
 	
 	Rulename.Rulename   = ID "@"
