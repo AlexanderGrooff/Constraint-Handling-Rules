@@ -40,6 +40,7 @@ rules
 	desugar: Not(e) -> UnOp(NotOp(), e)
 	
 	desugar: Noguard() -> Guard([True()])
+	desugar: CHR(id) -> CHRConstraintParentheses(id, [])
    
 strategies
 
