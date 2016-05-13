@@ -16,10 +16,8 @@ rules:
 	<{Rule "\n"}+>
 
 store:
-	<Store>
+	<{CHRConstraint ", "}*>
 >
-
-	Store = CHRConstraint+
 	
 	Rulename.Rulename   = ID "@"
 	Rulename.NoRulename = 
