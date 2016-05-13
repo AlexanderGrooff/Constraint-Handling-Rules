@@ -6,6 +6,9 @@
  *   gcd(12), gcd(8)
  *
  */
+rules:
+	cleanup @ gcd(0) <=> true
+	gcd(N) \ gcd(M) <=> 0 < N, N <= M | gcd(M % N)
 
-cleanup @ gcd(0) <=> true
-gcd(N) \ gcd(M) <=> 0 < N, N <= M | gcd(M % N)
+store:
+	gcd(0)

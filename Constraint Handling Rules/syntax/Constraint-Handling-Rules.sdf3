@@ -8,11 +8,18 @@ imports
 context-free start-symbols
 
 	Start
-	Store
 
 context-free syntax
 
-	Start = Rule+
+	Start = <
+rules:
+	<Rules>
+
+store:
+	<Store>
+>
+
+	Rules = Rule+
 	Store = CHRConstraint+
 	
 	Rulename.Rulename   = ID "@"
