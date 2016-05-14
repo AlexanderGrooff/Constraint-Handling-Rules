@@ -1,17 +1,17 @@
 module Prolog
 
 imports
-  
-  Atom
-  Common
+
+	Atom
+	Common
 
 context-free start-symbols
-  
-  Start
+
+	Start
 
 context-free syntax
-  
-  	Start = Statement+ Query
-	Statement.Rule = Atom ":-" Atom "."
-	Statement.Fact = Atom "."
-	Query.Query = "?-" Statement "."
+
+	Start          = Statement+ Query
+	Statement.Rule = Term ":-" Term "."
+	Statement.Fact = Term "."
+	Query.Query    = "?-" Statement "."

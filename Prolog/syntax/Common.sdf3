@@ -2,10 +2,15 @@ module Common
 
 lexical syntax
 
-  ID             = [a-zA-Z] [a-zA-Z0-9]* 
+  ATOMID         = [a-z] [a-zA-Z0-9\_]* 
+  ATOMID         = "'" AtomStringChar* "'" 
+  VARID          = [A-Z\_] [a-zA-Z0-9\_]* 
   INT            = "-"? [0-9]+ 
   FLOAT          = "-"? [0-9]+"."[0-9]+
   STRING         = "\"" StringChar* "\"" 
+  AtomStringChar = ~[\'\n] 
+  AtomStringChar = "\\'" 
+  AtomStringChar = BackSlashChar 
   StringChar     = ~[\"\n] 
   StringChar     = "\\\"" 
   StringChar     = BackSlashChar 
@@ -26,7 +31,9 @@ lexical restrictions
   
   CommentChar   -/- [\/]
   INT           -/- [0-9]
-  ID            -/- [a-zA-Z0-9\_]
+  FLOAT         -/- [0-9]
+  ATOMID        -/- [a-zA-Z0-9\_]
+  VARID         -/- [a-zA-Z0-9\_]
   
   // EOF may not be followed by any char
   

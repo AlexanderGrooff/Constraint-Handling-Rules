@@ -3,10 +3,12 @@ module Atom
 imports 
 	Common
 context-free start-symbols
-	Atom
+	Term
 context-free syntax
-	Atom.Var = ID
-	Atom.Number = INT
-	Atom.Float = FLOAT
-	Atom.List = [{Atom ", "}+]
-	Atom.CompoundTerm = ID"("{Atom ","}*")"
+	Term.Atom         = ATOMID
+	Term.Int          = INT
+	Term.Float        = FLOAT
+	Term.String       = STRING
+	Term.Var          = VARID
+	Term.List         = <[<{Term ", "}*>]>
+	Term.CompoundTerm = <<ATOMID>(<{Term ", "}+>)>
