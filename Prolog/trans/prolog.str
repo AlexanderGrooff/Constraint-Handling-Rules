@@ -6,6 +6,14 @@ imports
   pp
   outline
   analysis
+  desugar
+
+rules // Editor Services
+  editor-desugar:
+    (selected, position, ast, path, project-path) -> (filename, text)
+    where
+      filename := <guarantee-extension(|"desugared.aterm")> path
+    ; text     := <desugar-all> selected
 
 rules // Debugging
   

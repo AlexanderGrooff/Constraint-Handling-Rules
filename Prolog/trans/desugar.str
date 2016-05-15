@@ -1,0 +1,10 @@
+module desugar
+
+imports
+  src-gen/signatures/-
+
+rules
+  desugar: Fact(t) -> Rule(t, Atom("true"))
+
+strategies
+  desugar-all = topdown(try(desugar))

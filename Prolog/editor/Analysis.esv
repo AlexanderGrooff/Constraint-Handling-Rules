@@ -15,6 +15,7 @@ menus
   menu: "Analysis" (openeditor)
 
     action: "Show analyzed AST" = debug-show-analyzed
+    action: "Desugar" = editor-desugar
 
     submenu: "Show analysis"
       action: "Project"   = debug-project
