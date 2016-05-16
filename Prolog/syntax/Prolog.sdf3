@@ -14,4 +14,4 @@ context-free syntax
 	Start          = Statement+ Query
 	Statement.Rule = Term ":-" Term "."
 	Statement.Fact = Term "."
-	Query.Query    = "?-" Statement "."
+	Query.Query    = "?-" Term "."
