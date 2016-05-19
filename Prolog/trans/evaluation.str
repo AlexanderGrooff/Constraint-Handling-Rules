@@ -4,7 +4,13 @@ imports
   src-gen/signatures/-
 
 rules
-  evaluate(|rulls*): Atom(ajd) -> Atom("True")
-  evaluate(|rulls*): CompoundTerm(ajd, params*) -> Atom("True")
+  unify(|rulls*): (_, Atom("true")) -> "true"
+  unify(|rulls*): ([Rule(Atom(x), subgoal) | remainingrules*], Atom(x)) -> <unify(|rulls*)> (rulls*, subgoal)
+  unify(|rulls*): ([Rule(Int(x), subgoal) | remainingrules*], Int(x)) -> <unify(|rulls*)> (rulls*, subgoal)
+  unify(|rulls*): ([Rule(Float(x), subgoal) | remainingrules*], Float(x)) -> <unify(|rulls*)> (rulls*, subgoal)
+  unify(|rulls*): ([Rule(CompoundTerm(x, args1*), subgoal) | remainingrules*], CompoundTerm(x, args2*)) -> <unify(|rulls*)> (rulls*, subgoal)
+    where <eq>(<length> args1*, <length> args2*)
+  unify(|rulls*): ([rule | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
+  unify(|rulls*): ([], _) -> <fail>
 
-  evaluate-full: (rulls*, Query(q)) -> <evaluate(|rulls*)> q
+  evaluate-full: (rulls*, Query(goal)) -> <unify(|rulls*)> (rulls*, goal)
