@@ -1,2 +1,2 @@
 cat(tom) :- true.
-?- cat(x) .
+?- cat(X).

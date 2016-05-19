@@ -1,0 +1,10 @@
+module evaluation
+
+imports
+  src-gen/signatures/-
+
+rules
+  evaluate(|rulls*): Atom(ajd) -> Atom("True")
+  evaluate(|rulls*): CompoundTerm(ajd, params*) -> Atom("True")
+
+  evaluate-full: (rulls*, Query(q)) -> <evaluate(|rulls*)> q

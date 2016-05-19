@@ -7,6 +7,7 @@ imports
   outline
   analysis
   desugar
+  evaluation
 
 rules // Editor Services
   editor-desugar:
@@ -14,6 +15,12 @@ rules // Editor Services
     where
       filename := <guarantee-extension(|"desugared.aterm")> path
     ; text     := <desugar-all> selected
+
+  editor-evaluate:
+    (selected, position, ast, path, project-path) -> (filename, text)
+    where
+      filename := <guarantee-extension(|"evaluated.aterm")> path
+    ; text     := <evaluate-full> selected
 
 rules // Debugging
   
