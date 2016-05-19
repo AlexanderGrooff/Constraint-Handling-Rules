@@ -10,7 +10,13 @@ rules
   unify(|rulls*): ([Rule(Float(x), subgoal) | remainingrules*], Float(x)) -> <unify(|rulls*)> (rulls*, subgoal)
   unify(|rulls*): ([Rule(CompoundTerm(x, args1*), subgoal) | remainingrules*], CompoundTerm(x, args2*)) -> <unify(|rulls*)> (rulls*, subgoal)
     where <eq>(<length> args1*, <length> args2*)
+    ;	bound-args* := <bind-vars> (args1*, args2*)
   unify(|rulls*): ([rule | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
   unify(|rulls*): ([], _) -> <fail>
+
+  bind-vars: ([], []) -> []
+  bind-vars: ([arg | args*], [Var(args2) | args2*]) -> [arg | <bind-vars> (args*, args2*)]
+  bind-vars: ([arg | args*], [arg2 | args2*]) -> [arg2 | <bind-vars> (args*, args2*)]
+		
 
   evaluate-full: (rulls*, Query(goal)) -> <unify(|rulls*)> (rulls*, goal)
