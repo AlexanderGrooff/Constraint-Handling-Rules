@@ -11,6 +11,15 @@ rules
   unify(|rulls*): ([Rule(CompoundTerm(x, args1*), subgoal) | remainingrules*], CompoundTerm(x, args2*)) -> <unify(|rulls*)> (rulls*, subgoal)
     where <eq>(<length> args1*, <length> args2*)
     ;	bound-args* := <bind-vars> (args1*, args2*)
+  // Insert list unify here
+  unify(|rulls*): ([Rule(Var(x), subgoal) | remainingrules*], Var(y)) -> <unify(|rulls*)> (rulls*, subgoal)
+  	// Share bindings between x and y
+  unify(|rulls*): ([Rule(Var(x), subgoal) | remainingrules*], goal) -> <unify(|rulls*)> (rulls*, subgoal)
+  	// Evaluate subgoal with x = goal
+  unify(|rulls*): ([Rule(String(x), subgoal) | remainingrules*], String(x)) -> <unify(|rulls*)> (rulls*, subgoal)
+  unify(|rulls*): ([Rule(Atom(x), subgoal) | remainingrules*], String(x)) -> <unify(|rulls*)> (rulls*, subgoal)
+  unify(|rulls*): ([Rule(String(x), subgoal) | remainingrules*], Atom(x)) -> <unify(|rulls*)> (rulls*, subgoal)
+  
   unify(|rulls*): ([rule | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
   unify(|rulls*): ([], _) -> <fail>
 
