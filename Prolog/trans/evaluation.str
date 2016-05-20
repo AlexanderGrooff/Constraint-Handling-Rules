@@ -9,7 +9,8 @@ rules
     where store2* := <unify> (arg1, arg2, store*)
   args-unify: ([], [], store*) -> store*
   
-  lookup-store: (x, []) -> $[var [x] not found]
+  lookup-store: (x, []) -> <fail>
+  	with <debug> $[var [x] not found]
   lookup-store: (x, [(x, val) | store*]) -> val
   lookup-store: (x, [_ | store*]) -> <lookup-store> (x, store*)
   
