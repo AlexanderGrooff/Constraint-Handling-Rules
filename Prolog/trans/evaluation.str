@@ -5,24 +5,25 @@ imports
   desugar
 
 rules
-  unify(|rulls*): (_, Atom("true")) -> "true"
-  unify(|rulls*): ([Rule(Atom(x), subgoal) | remainingrules*], Atom(x)) -> <unify(|rulls*)> (rulls*, subgoal)
-  unify(|rulls*): ([Rule(Int(x), subgoal) | remainingrules*], Int(x)) -> <unify(|rulls*)> (rulls*, subgoal)
-  unify(|rulls*): ([Rule(Float(x), subgoal) | remainingrules*], Float(x)) -> <unify(|rulls*)> (rulls*, subgoal)
-  unify(|rulls*): ([Rule(CompoundTerm(x, args1*), subgoal) | remainingrules*], CompoundTerm(x, args2*)) -> <unify(|rulls*)> (rulls*, subgoal)
+  args-unify: ([arg1|args1*], [arg2|args2*], store*) -> <args-unify> (args1*, args2*, store2*)
+    where store2* := <unify> (arg1, arg2, store*)
+  args-unify: ([], [], store*) -> store*
+
+  unify: (Atom(x), Atom(x), store*) -> store*
+  unify: (Int(x), Int(x), store*) -> store*
+  unify: (Float(x), Float(x), store*) -> store*
+  unify: (String(x), String(x), store*) -> store*
+  unify: (Atom(x), String(x), store*) -> store*
+  unify: (String(x), Atom(x), store*) -> store*
+  unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*), store*) -> <args-unify> (args1*, args2*, store*)
     where <eq>(<length> args1*, <length> args2*)
-    ;	bound-args* := <bind-vars> (args1*, args2*)
-  // Insert list unify here
-  unify(|rulls*): ([Rule(Var(x), subgoal) | remainingrules*], Var(y)) -> <unify(|rulls*)> (rulls*, subgoal)
-  	// Share bindings between x and y
-  unify(|rulls*): ([Rule(Var(x), subgoal) | remainingrules*], goal) -> <unify(|rulls*)> (rulls*, subgoal)
-  	// Evaluate subgoal with x = goal
-  unify(|rulls*): ([Rule(String(x), subgoal) | remainingrules*], String(x)) -> <unify(|rulls*)> (rulls*, subgoal)
-  unify(|rulls*): ([Rule(Atom(x), subgoal) | remainingrules*], String(x)) -> <unify(|rulls*)> (rulls*, subgoal)
-  unify(|rulls*): ([Rule(String(x), subgoal) | remainingrules*], Atom(x)) -> <unify(|rulls*)> (rulls*, subgoal)
-  
-  unify(|rulls*): ([rule | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
-  unify(|rulls*): ([], _) -> <fail>
+  unify: (Var(x), goal, store*) -> [(x,goal)|store*]
+
+  unify(|rulls*): (_, Atom("true")) -> "true"
+  unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (rulls*, subgoal)
+    where store*  := <unify> (head, goal);
+          subgoal := <substitute> (body, store*)
+          //unify(|rulls*): ([], _) -> <fail>
 
   bind-vars: ([], []) -> []
   bind-vars: ([arg | args*], [Var(args2) | args2*]) -> [arg | <bind-vars> (args*, args2*)]
