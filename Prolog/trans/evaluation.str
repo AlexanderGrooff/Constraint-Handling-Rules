@@ -34,7 +34,7 @@ rules
 
   unify(|rulls*): (_, Atom("true")) -> "true"
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (rulls*, subgoal)
-    where store*  := <unify> (head, goal);
+    where store*  := <unify> (head, goal, []);
           subgoal := <substitute> (body, store*)
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
 //unify(|rulls*): ([], _) -> <fail>
@@ -42,5 +42,5 @@ rules
 		
 
   evaluate-full: (rulls*, Query(goal)) -> <unify(|desugared-rules*)> (desugared-rules*, <desugar-all>goal)
-  	where
+  	with
   		desugared-rules* := <desugar-all> rulls*
