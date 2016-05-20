@@ -2,13 +2,26 @@ module Atom
 
 imports 
 	Common
+
 context-free start-symbols
 	Term
+
 context-free syntax
-	Term.Atom         = ATOMID
-	Term.Int          = INT
-	Term.Float        = FLOAT
-	Term.String       = STRING
-	Term.Var          = VARID
-	Term.List         = <[<{Term ", "}*>]>
-	Term.CompoundTerm = <<ATOMID>(<{Term ", "}+>)>
+	Callable.Atom         = ATOMID
+	Callable.CompoundTerm = <<ATOMID>(<{Term ", "}+>)>
+
+	Term                  = Callable
+	Term.Int              = INT
+	Term.Float            = FLOAT
+	Term.String           = STRING
+	Term.Var              = VARID
+	Term.List             = <[<{Term ", "}*>]>
+	Term.ListCons         = <[<Term> | <Term>]>
+	Term.Conj             = <<Term>, <Term>> {avoid}
+	Term.Disj             = <<Term>; <Term>>
+	Term                  = <(<Term>)> {bracket}
+
+context-free priorities
+	{Term.List Callable.CompoundTerm} >
+	{left: Term.Conj} >
+	{left: Term.Disj}

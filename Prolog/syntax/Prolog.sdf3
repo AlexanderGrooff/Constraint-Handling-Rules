@@ -11,7 +11,9 @@ context-free start-symbols
 
 context-free syntax
 
-	Start          = Statement+ Query
-	Statement.Rule = Term ":-" Term "."
-	Statement.Fact = Term "."
-	Query.Query    = "?-" Term "."
+	Start          = <<Statement+>
+
+<Query>>
+	Statement.Rule = <<Callable> :- <Term>.>
+	Statement.Fact = <<Callable>.>
+	Query.Query    = <?- <Term>.>
