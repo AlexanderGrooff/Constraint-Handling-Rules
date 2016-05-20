@@ -16,8 +16,9 @@ rules
   substitute: (Atom(x), store*) -> Atom(x)
   substitute: (Int(x), store*) -> Int(x)
   substitute: (Float(x), store*) -> Float(x)
-  substitute: (CompoundTerm(x, args*), store*) -> <substitute-list> (args*, store*)
+  substitute: (CompoundTerm(x, args*), store*) -> CompoundTerm(x, <substitute-list> (args*, store*))
   substitute: (Var(x), store*) -> <lookup-store> (x, store*)
+  substitute: (String(x), store*) -> String(x)
   substitute-list: ([], store*) -> []
   substitute-list: ([arg | args*], store*) -> [<substitute> (arg, store*) | <substitute-list> (args*, store*)]
   
@@ -37,7 +38,7 @@ rules
     where store*  := <unify> (head, goal, []);
           subgoal := <substitute> (body, store*)
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
-//unify(|rulls*): ([], _) -> <fail>
+  unify(|rulls*): ([], _) -> <fail>
 
 		
 
