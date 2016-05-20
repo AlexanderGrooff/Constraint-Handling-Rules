@@ -8,6 +8,19 @@ rules
   args-unify: ([arg1|args1*], [arg2|args2*], store*) -> <args-unify> (args1*, args2*, store2*)
     where store2* := <unify> (arg1, arg2, store*)
   args-unify: ([], [], store*) -> store*
+  
+  lookup-store: (x, []) -> $[var [x] not found]
+  lookup-store: (x, [(x, val) | store*]) -> val
+  lookup-store: (x, [_ | store*]) -> <lookup-store> (x, store*)
+  
+  substitute: (Atom(x), store*) -> Atom(x)
+  substitute: (Int(x), store*) -> Int(x)
+  substitute: (Float(x), store*) -> Float(x)
+  substitute: (CompoundTerm(x, args*), store*) -> <substitute-list> (args*, store*)
+  substitute: (Var(x), store*) -> <lookup-store> (x, store*)
+  substitute-list: ([], store*) -> []
+  substitute-list: ([arg | args*], store*) -> [<substitute> (arg, store*) | <substitute-list> (args*, store*)]
+  
 
   unify: (Atom(x), Atom(x), store*) -> store*
   unify: (Int(x), Int(x), store*) -> store*
@@ -26,9 +39,6 @@ rules
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
 //unify(|rulls*): ([], _) -> <fail>
 
-//bind-vars: ([], []) -> []
-//bind-vars: ([arg | args*], [Var(args2) | args2*]) -> [arg | <bind-vars> (args*, args2*)]
-//bind-vars: ([arg | args*], [arg2 | args2*]) -> [arg2 | <bind-vars> (args*, args2*)]
 		
 
   evaluate-full: (rulls*, Query(goal)) -> <unify(|desugared-rules*)> (desugared-rules*, <desugar-all>goal)
