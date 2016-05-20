@@ -23,11 +23,12 @@ rules
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (rulls*, subgoal)
     where store*  := <unify> (head, goal);
           subgoal := <substitute> (body, store*)
-          //unify(|rulls*): ([], _) -> <fail>
+  unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
+//unify(|rulls*): ([], _) -> <fail>
 
-  bind-vars: ([], []) -> []
-  bind-vars: ([arg | args*], [Var(args2) | args2*]) -> [arg | <bind-vars> (args*, args2*)]
-  bind-vars: ([arg | args*], [arg2 | args2*]) -> [arg2 | <bind-vars> (args*, args2*)]
+//bind-vars: ([], []) -> []
+//bind-vars: ([arg | args*], [Var(args2) | args2*]) -> [arg | <bind-vars> (args*, args2*)]
+//bind-vars: ([arg | args*], [arg2 | args2*]) -> [arg2 | <bind-vars> (args*, args2*)]
 		
 
   evaluate-full: (rulls*, Query(goal)) -> <unify(|desugared-rules*)> (desugared-rules*, <desugar-all>goal)
