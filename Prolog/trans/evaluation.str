@@ -38,7 +38,7 @@ rules
     where store*  := <unify> (head, goal, []);
           subgoal := <substitute> (body, store*)
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (remainingrules*, goal)
-  unify(|rulls*): ([], _) -> <fail>
+  unify(|rulls*): ([], _) -> "false"
 
 		
 
