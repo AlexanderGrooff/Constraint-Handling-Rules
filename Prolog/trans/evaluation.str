@@ -2,6 +2,7 @@ module evaluation
 
 imports
   src-gen/signatures/-
+  desugar
 
 rules
   unify(|rulls*): (_, Atom("true")) -> "true"
@@ -28,4 +29,6 @@ rules
   bind-vars: ([arg | args*], [arg2 | args2*]) -> [arg2 | <bind-vars> (args*, args2*)]
 		
 
-  evaluate-full: (rulls*, Query(goal)) -> <unify(|rulls*)> (rulls*, goal)
+  evaluate-full: (rulls*, Query(goal)) -> <unify(|desugared-rules*)> (desugared-rules*, <desugar-all>goal)
+  	where
+  		desugared-rules* := <desugar-all> rulls*
