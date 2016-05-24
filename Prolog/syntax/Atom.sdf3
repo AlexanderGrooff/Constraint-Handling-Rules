@@ -7,21 +7,29 @@ context-free start-symbols
 	Term
 
 context-free syntax
-	Callable.Atom         = ATOMID
-	Callable.CompoundTerm = <<ATOMID>(<{Term ", "}+>)>
+	Term                   = Callable
+	Term                   = Basic
+	Term                   = <(<Term>)> {bracket}
 
-	Term                  = Callable
-	Term.Int              = INT
-	Term.Float            = FLOAT
-	Term.String           = STRING
-	Term.Var              = VARID
-	Term.List             = <[<{Term ", "}*>]>
-	Term.ListCons         = <[<Term> | <Term>]>
-	Term.Conj             = <<Term>, <Term>> {avoid}
-	Term.Disj             = <<Term>; <Term>>
-	Term                  = <(<Term>)> {bracket}
+	TermNoJunction         = Definable
+	TermNoJunction         = Basic
+	TermNoJunction         = <(<TermNoJunction>)> {bracket}
+
+	Callable               = Definable
+	Callable.Conj          = <<Term>, <Term>>
+	Callable.Disj          = <<Term>; <Term>>
+
+	Definable.Atom         = ATOMID
+	Definable.CompoundTerm = <<ATOMID>(<{TermNoJunction ", "}+>)>
+
+	Basic.Int              = INT
+	Basic.Float            = FLOAT
+	Basic.String           = STRING
+	Basic.Var              = VARID
+	Basic.List             = <[<{TermNoJunction ", "}+>]>
+	Basic.ListCon          = <[<TermNoJunction> | <TermNoJunction>]>
+	Basic.ListNil          = <[]>
 
 context-free priorities
-	{Term.List Callable.CompoundTerm} >
-	{left: Term.Conj} >
-	{left: Term.Disj}
+	{left: Callable.Conj} >
+	{left: Callable.Disj}
