@@ -5,6 +5,8 @@ imports
 
 rules
   desugar: Fact(t) -> Rule(t, Atom("true"))
+  desugar: List([e | es*]) -> ListCon(e, List(es*))
+  desugar: List([]) -> ListNil()
 
 strategies
   desugar-all = topdown(try(desugar))
