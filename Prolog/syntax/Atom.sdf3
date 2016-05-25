@@ -16,8 +16,9 @@ context-free syntax
 	TermNoJunction         = <(<TermNoJunction>)> {bracket}
 
 	Callable               = Definable
-	Callable.Conj          = <<Term>, <Term>>
-	Callable.Disj          = <<Term>; <Term>>
+	Callable.Conj          = <<Term>, <Term>> {left}
+	Callable.Disj          = <<Term>; <Term>> {left}
+	Callable.Neg           = <\\+ <Term>> {right}
 
 	Definable.Atom         = ATOMID
 	Definable.CompoundTerm = <<ATOMID>(<{TermNoJunction ", "}+>)>
@@ -31,5 +32,6 @@ context-free syntax
 	Basic.ListNil          = <[]>
 
 context-free priorities
+	{right: Callable.Neg} >
 	{left: Callable.Conj} >
 	{left: Callable.Disj}
