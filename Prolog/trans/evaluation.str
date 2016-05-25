@@ -35,6 +35,15 @@ rules
   unify: (Var(x), goal, store*) -> [(x,goal)|store*]
 
   unify(|rulls*): (_, Atom("true")) -> "true"
+  unify(|rulls*): (_, Conj(goal1, goal2)) -> "true"
+    where <unify(|rulls*);?"true"> (rulls*, goal1);
+          <unify(|rulls*);?"true"> (rulls*, goal2)
+  unify(|rulls*): (_, Conj(goal1, goal2)) -> "false"
+  unify(|rulls*): (_, Disj(goal1, goal2)) -> "true"
+    where <unify(|rulls*);?"true"> (rulls*, goal1)
+  unify(|rulls*): (_, Disj(goal1, goal2)) -> "true"
+    where <unify(|rulls*);?"true"> (rulls*, goal2)
+  unify(|rulls*): (_, Disj(goal1, goal2)) -> "false"
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> <unify(|rulls*)> (rulls*, subgoal)
     where store*  := <unify> (head, goal, []);
           subgoal := <substitute> (body, store*)
