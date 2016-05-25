@@ -46,6 +46,9 @@ rules
   unify(|rulls*): (_, Disj(goal1, goal2), store*) -> "true"
     where <unify(|rulls*);?"true"> (rulls*, goal2, store*)
   unify(|rulls*): (_, Disj(goal1, goal2), store*) -> "false"
+  unify(|rulls*): (_, Neg(goal), store*) -> "false"
+    where <unify(|rulls*);?"true"> (rulls*, goal, store*)
+  unify(|rulls*): (_, Neg(goal), store*) -> "true"
   unify(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <unify(|rulls*)> (rulls*, subgoal, store*)
     where new-store*  := <debug><debug;unify> (head, goal, store*);
           subgoal := <debug><debug;substitute>(body, new-store*)
