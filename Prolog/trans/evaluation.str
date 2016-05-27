@@ -12,6 +12,7 @@ rules
   lookup-store: (x, []) -> Var(x)
   	with <debug> $[var [x] not found]
   lookup-store: (x, [(x, val) | store*]) -> val
+  	with <debug> $[found value for [x]]
   lookup-store: (x, [_ | store*]) -> <lookup-store> (x, store*)
   
   substitute: (Atom(x), store*) -> Atom(x)
@@ -27,8 +28,7 @@ rules
   unify-var: (Var(x), value, []) -> (x, value)
   	with <debug> $[No previous definition found of [x]]
   unify-var: (Var(x), value, [(x, value) | store*]) -> []
-//  unify-var: (Var(x), value, [(x, value2) | store*]) -> <fail>
-//  	with <debug> $[unify should fail]
+  	with <debug> $[Previous definition of [x] found with same value]
   unify-var: (Var(x), value, [(t, _) | store*]) -> <unify-var> (Var(x), value, store*)
     where 
       <not(?t)> x
@@ -44,24 +44,33 @@ rules
   unify: (Var(x), goal, store*) -> [<unify-var> (Var(x), goal, store*) |store*]
   unify: (head, Var(x), store*) -> [<unify-var> (Var(x), head, store*) |store*]
 
-  evaluate(|rulls*): (_, Atom("true"), store*) -> "true"
-  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> "true"
-    where <evaluate(|rulls*);?"true"> (rulls*, goal1, store*);
-          <evaluate(|rulls*);?"true"> (rulls*, goal2, store*)
-  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> "false"
-  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> "true"
-    where <evaluate(|rulls*);?"true"> (rulls*, goal1, store*)
-  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> "true"
-    where <evaluate(|rulls*);?"true"> (rulls*, goal2, store*)
-  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> "false"
-  evaluate(|rulls*): (_, Neg(goal), store*) -> "false"
-    where <evaluate(|rulls*);?"true"> (rulls*, goal, store*)
-  evaluate(|rulls*): (_, Neg(goal), store*) -> "true"
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <evaluate(|rulls*)> (rulls*, subgoal, store*)
-    where new-store*  := <debug><debug;unify> (head, goal, store*);
-          subgoal := <debug><debug;substitute>(body, new-store*)
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <evaluate(|rulls*)> (remainingrules*, goal, store*)
-  evaluate(|rulls*): ([], _, store*) -> "false"
+  evaluate(|rulls*): (_, Atom("true"), store*) -> ("true", store*)
+  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("true", store3*)
+    where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal1, store*);
+    	<eq>(str, "true");
+    	<debug> $[Evaluating second part of Conj];
+      	(str2, store3*) :=<evaluate(|rulls*)> (rulls*, goal2, store2*);
+      	<eq>(str2, "true")
+  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("false", store*)
+  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("true", store2*)
+    where (_, store2*) := <evaluate(|rulls*);?("true", _)> (rulls*, goal1, store*)
+  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("true", store2*)
+    where (_, store2*) := <evaluate(|rulls*);?("true", _)> (rulls*, goal2, store*)
+  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("false", store*)
+  evaluate(|rulls*): (_, Neg(goal), store*) -> ("false", store*)
+    where (str, new-store*) := <evaluate(|rulls*)> (rulls*, goal, store*);
+    	<eq>(str, "true")
+  evaluate(|rulls*): (_, Neg(goal), store*) -> ("true", store*)
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (rulls*, subgoal, store*), new-store*)
+    where 
+    	<debug>$[Unify args:];
+    	<debug>(head, goal, store*);
+    	<debug>$[Unify result:];
+    	new-store*  := <debug> <unify> (head, goal, store*);
+    	<debug>$[Substitute result:];
+      	subgoal := <debug><substitute>(body, new-store*)
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (remainingrules*, goal, store*),store*)
+  evaluate(|rulls*): ([], _, store*) -> ("false", store*)
 
 		
 
