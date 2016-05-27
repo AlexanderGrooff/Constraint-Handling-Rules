@@ -24,6 +24,11 @@ rules
   substitute-list: ([], store*) -> []
   substitute-list: ([arg | args*], store*) -> [<substitute> (arg, store*) | <substitute-list> (args*, store*)]
   
+  unify-var: (Var(x), value, []) -> (x, value)
+  	with <debug> $[No previous definition found of [x]]
+  unify-var: (Var(x), value, [(x, value) | store*]) -> []
+  unify-var: (Var(x), value, [(x, value2) | store*]) -> <fail>
+  unify-var: (Var(x), value, [(_, _) | store*]) -> <unify-var> (Var(x), value, store*)
 
   unify: (Atom(x), Atom(x), store*) -> store*
   unify: (Int(x), Int(x), store*) -> store*
@@ -33,8 +38,8 @@ rules
   unify: (String(x), Atom(x), store*) -> store*
   unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*), store*) -> <args-unify> (args1*, args2*, store*)
     where <eq>(<length> args1*, <length> args2*)
-  unify: (Var(x), goal, store*) -> [(x,goal)|store*]
-  unify: (head, Var(x), store*) -> [(x,head)|store*]
+  unify: (Var(x), goal, store*) -> [<unify-var> (Var(x), goal, store*) |store*]
+  unify: (head, Var(x), store*) -> [<unify-var> (Var(x), head, store*) |store*]
 
   unify(|rulls*): (_, Atom("true"), store*) -> "true"
   unify(|rulls*): (_, Conj(goal1, goal2), store*) -> "true"
