@@ -44,27 +44,27 @@ rules
   unify: (Var(x), goal, store*) -> [<unify-var> (Var(x), goal, store*) |store*]
   unify: (head, Var(x), store*) -> [<unify-var> (Var(x), head, store*) |store*]
 
-  unify(|rulls*): (_, Atom("true"), store*) -> "true"
-  unify(|rulls*): (_, Conj(goal1, goal2), store*) -> "true"
-    where <unify(|rulls*);?"true"> (rulls*, goal1, store*);
-          <unify(|rulls*);?"true"> (rulls*, goal2, store*)
-  unify(|rulls*): (_, Conj(goal1, goal2), store*) -> "false"
-  unify(|rulls*): (_, Disj(goal1, goal2), store*) -> "true"
-    where <unify(|rulls*);?"true"> (rulls*, goal1, store*)
-  unify(|rulls*): (_, Disj(goal1, goal2), store*) -> "true"
-    where <unify(|rulls*);?"true"> (rulls*, goal2, store*)
-  unify(|rulls*): (_, Disj(goal1, goal2), store*) -> "false"
-  unify(|rulls*): (_, Neg(goal), store*) -> "false"
-    where <unify(|rulls*);?"true"> (rulls*, goal, store*)
-  unify(|rulls*): (_, Neg(goal), store*) -> "true"
-  unify(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <unify(|rulls*)> (rulls*, subgoal, store*)
+  evaluate(|rulls*): (_, Atom("true"), store*) -> "true"
+  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> "true"
+    where <evaluate(|rulls*);?"true"> (rulls*, goal1, store*);
+          <evaluate(|rulls*);?"true"> (rulls*, goal2, store*)
+  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> "false"
+  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> "true"
+    where <evaluate(|rulls*);?"true"> (rulls*, goal1, store*)
+  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> "true"
+    where <evaluate(|rulls*);?"true"> (rulls*, goal2, store*)
+  evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> "false"
+  evaluate(|rulls*): (_, Neg(goal), store*) -> "false"
+    where <evaluate(|rulls*);?"true"> (rulls*, goal, store*)
+  evaluate(|rulls*): (_, Neg(goal), store*) -> "true"
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <evaluate(|rulls*)> (rulls*, subgoal, store*)
     where new-store*  := <debug><debug;unify> (head, goal, store*);
           subgoal := <debug><debug;substitute>(body, new-store*)
-  unify(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <unify(|rulls*)> (remainingrules*, goal, store*)
-  unify(|rulls*): ([], _, store*) -> "false"
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <evaluate(|rulls*)> (remainingrules*, goal, store*)
+  evaluate(|rulls*): ([], _, store*) -> "false"
 
 		
 
-  evaluate-full: (rulls*, Query(goal)) -> <unify(|desugared-rules*)> (desugared-rules*, <desugar-all>goal, [])
+  evaluate-full: (rulls*, Query(goal)) -> <evaluate(|desugared-rules*)> (desugared-rules*, <desugar-all>goal, [])
   	with
   		desugared-rules* := <desugar-all> rulls*
