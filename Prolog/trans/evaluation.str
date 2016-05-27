@@ -6,7 +6,7 @@ imports
 
 rules
   args-unify: ([arg1|args1*], [arg2|args2*], store*) -> <args-unify> (args1*, args2*, store2*)
-    with store2* := <unify> (arg1, arg2, store*)
+    where store2* := <unify> (arg1, arg2, store*)
   args-unify: ([], [], store*) -> store*
   
   lookup-store: (x, []) -> Var(x)
@@ -27,8 +27,8 @@ rules
   unify-var: (Var(x), value, []) -> (x, value)
   	with <debug> $[No previous definition found of [x]]
   unify-var: (Var(x), value, [(x, value) | store*]) -> []
-  unify-var: (Var(x), value, [(x, value2) | store*]) -> <fail>
-  	with <debug> $[unify should fail]
+//  unify-var: (Var(x), value, [(x, value2) | store*]) -> <fail>
+//  	with <debug> $[unify should fail]
   unify-var: (Var(x), value, [(t, _) | store*]) -> <unify-var> (Var(x), value, store*)
     where 
       <not(?t)> x
