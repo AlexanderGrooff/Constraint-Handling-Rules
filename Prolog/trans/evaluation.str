@@ -53,15 +53,17 @@ rules
       	<eq>(str2, "true")
   evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("false", store*)
   evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("true", store2*)
-    where (_, store2*) := <evaluate(|rulls*);?("true", _)> (rulls*, goal1, store*)
+    where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal1, store*);
+    	<eq>(str, "true")
   evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("true", store2*)
-    where (_, store2*) := <evaluate(|rulls*);?("true", _)> (rulls*, goal2, store*)
+    where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal2, store*);
+    	<eq>(str, "true")
   evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("false", store*)
   evaluate(|rulls*): (_, Neg(goal), store*) -> ("false", store*)
     where (str, new-store*) := <evaluate(|rulls*)> (rulls*, goal, store*);
     	<eq>(str, "true")
   evaluate(|rulls*): (_, Neg(goal), store*) -> ("true", store*)
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (rulls*, subgoal, store*), new-store*)
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (rulls*, subgoal, store*), [new-store*, store*])
     where 
     	<debug>$[Unify args:];
     	<debug>(head, goal, store*);
