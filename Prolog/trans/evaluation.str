@@ -5,9 +5,9 @@ imports
   desugar
 
 rules
-  args-unify: ([arg1|args1*], [arg2|args2*], store*) -> <args-unify> (args1*, args2*, store2*)
-    where store2* := <unify> (arg1, arg2, store*)
-  args-unify: ([], [], store*) -> store*
+  args-unify: ([arg1|args1*], [arg2|args2*], local-store*, free-store*) -> <args-unify> (args1*, args2*, local-store2*, free-store2*)
+    where (local-store2*, free-store2*) := <unify> (arg1, arg2, local-store*, free-store*)
+  args-unify: ([], [], local-store*, free-store*) -> (local-store*, free-store*)
   
   lookup-store: (x, []) -> Var(x)
   	with <debug> $[var [x] not found]
@@ -25,31 +25,33 @@ rules
   substitute-list: ([], store*) -> []
   substitute-list: ([arg | args*], store*) -> [<substitute> (arg, store*) | <substitute-list> (args*, store*)]
   
-  unify-var: (Var(x), value, []) -> (x, value)
-  	with <debug> $[No previous definition found of [x]]
-  unify-var: (Var(x), value, [(x, value) | store*]) -> []
+  unify-var: (x, value, store*) -> store*
+    where <fetch(?(x, found))> store*;
+          <eq> (found, value)
   	with <debug> $[Previous definition of [x] found with same value]
-  unify-var: (Var(x), value, [(t, _) | store*]) -> <unify-var> (Var(x), value, store*)
-    where 
-      <not(?t)> x
+  unify-var: (x, value, store*) -> [(x, value) |store*]
+    where <not(fetch(?(x, _)))> store*
+  	with <debug> $[No previous definition found of [x]]
 
-  unify: (Atom(x), Atom(x), store*) -> store*
-  unify: (Int(x), Int(x), store*) -> store*
-  unify: (Float(x), Float(x), store*) -> store*
-  unify: (String(x), String(x), store*) -> store*
-  unify: (Atom(x), String(x), store*) -> store*
-  unify: (String(x), Atom(x), store*) -> store*
-  unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*), store*) -> <args-unify> (args1*, args2*, store*)
+  unify: (Atom(x), Atom(x), local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (Int(x), Int(x), local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (Float(x), Float(x), local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (String(x), String(x), local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (Atom(x), String(x), local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (String(x), Atom(x), local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*), local-store*, free-store*) -> <args-unify> (args1*, args2*, local-store*, free-store*)
     where <eq>(<length> args1*, <length> args2*)
-  unify: (Var(x), goal, store*) -> [<unify-var> (Var(x), goal, store*) |store*]
-  unify: (head, Var(x), store*) -> [<unify-var> (Var(x), head, store*) |store*]
+  unify: (Var(x), goal, local-store*, free-store*) -> (new-store*, free-store*)
+    where new-store* := <unify-var> (x, goal, local-store*)
+  unify: (head, Var(x), local-store*, free-store*) -> (local-store*, new-store*)
+    where new-store* := <unify-var> (x, head, free-store*)
 
   evaluate(|rulls*): (_, Atom("true"), store*) -> ("true", store*)
   evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("true", store3*)
     where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal1, store*);
     	<eq>(str, "true");
     	<debug> $[Evaluating second part of Conj];
-      	(str2, store3*) :=<evaluate(|rulls*)> (rulls*, goal2, store2*);
+      	(str2, store3*) := <evaluate(|rulls*)> (rulls*, goal2, store2*);
       	<eq>(str2, "true")
   evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("false", store*)
   evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("true", store2*)
@@ -63,19 +65,22 @@ rules
     where (str, new-store*) := <evaluate(|rulls*)> (rulls*, goal, store*);
     	<eq>(str, "true")
   evaluate(|rulls*): (_, Neg(goal), store*) -> ("true", store*)
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (rulls*, subgoal, store*), new-store*)
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (rulls*, subgoal, []), free-store*)
     where 
-    	<debug>$[Unify args:];
+    	<debug>$[Unify args: ];
     	<debug>(head, goal, store*);
+    	(local-store*, free-store*) := <unify> (head, goal, [], store*);
     	<debug>$[Unify result:];
-    	new-store*  := <debug> <unify> (head, goal, store*);
+    	<debug>local-store*;
+    	<debug>free-store*;
+      	subgoal := <substitute>(body, local-store*);
     	<debug>$[Substitute result:];
-      	subgoal := <debug><substitute>(body, new-store*)
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (remainingrules*, goal, store*),store*)
+    	<debug>subgoal;
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (remainingrules*, goal, store*), store*)
   evaluate(|rulls*): ([], _, store*) -> ("false", store*)
 
 		
 
-  evaluate-full: (rulls*, Query(goal)) -> <evaluate(|desugared-rules*)> (desugared-rules*, <desugar-all>goal, [])
+  evaluate-full: (rulls*, Query(goal)) -> <evaluate(|desugared-rules*)> (desugared-rules*, <desugar-all> goal, [])
   	with
   		desugared-rules* := <desugar-all> rulls*
