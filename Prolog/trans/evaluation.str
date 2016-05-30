@@ -75,7 +75,7 @@ rules
     	<debug>free-store*;
       	subgoal := <substitute>(body, local-store*);
     	<debug>$[Substitute result:];
-    	<debug>subgoal;
+    	<debug>subgoal
   evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (remainingrules*, goal, store*), store*)
   evaluate(|rulls*): ([], _, store*) -> ("false", store*)
 
