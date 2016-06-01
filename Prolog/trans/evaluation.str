@@ -46,14 +46,15 @@ rules
   unify: (head, Var(x), local-store*, free-store*) -> (local-store*, new-store*)
     where new-store* := <unify-var> (x, head, free-store*)
 
-  evaluate(|rulls*): (_, Atom("true"), store*) -> ("true", store*)
-  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("true", store3*)
-    where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal1, store*);
+  evaluate(|rulls*): (_, Atom("true"), _) -> ("true", [])
+  evaluate(|rulls*): (remainingrules*, Conj(goal1, goal2), store*) -> ("true", store3*)
+    where (str, store2*) := <evaluate(|rulls*)> (remainingrules*, goal1, store*);
     	<eq>(str, "true");
     	<debug> $[Evaluating second part of Conj];
       	(str2, store3*) := <evaluate(|rulls*)> (rulls*, goal2, store2*);
       	<eq>(str2, "true")
-  evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("false", store*)
+  evaluate(|rulls*): ([Rule(_, _) | remainingrules*], Conj(goal1, goal2), store*) -> <evaluate(|rulls*)> (remainingrules*, Conj(goal1, goal2), store*)
+//evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("false", store*)
   evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("true", store2*)
     where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal1, store*);
     	<eq>(str, "true")
@@ -61,7 +62,7 @@ rules
     where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal2, store*);
     	<eq>(str, "true")
   evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("false", store*)
-  evaluate(|rulls*): (_, Neg(goal), store*) -> ("false", store*)
+  evaluate(|rulls*): (_, Neg(goal), store*) -> ("false", new-store*)
     where (str, new-store*) := <evaluate(|rulls*)> (rulls*, goal, store*);
     	<eq>(str, "true")
   evaluate(|rulls*): (_, Neg(goal), store*) -> ("true", store*)
@@ -76,10 +77,8 @@ rules
       	subgoal := <substitute>(body, local-store*);
     	<debug>$[Substitute result:];
     	<debug>subgoal
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (remainingrules*, goal, store*), store*)
+  evaluate(|rulls*): ([Rule(_, _) | remainingrules*], goal, store*) -> <evaluate(|rulls*)> (remainingrules*, goal, store*)
   evaluate(|rulls*): ([], _, store*) -> ("false", store*)
-
-		
 
   evaluate-full: (rulls*, Query(goal)) -> <evaluate(|desugared-rules*)> (desugared-rules*, <desugar-all> goal, [])
   	with
