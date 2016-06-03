@@ -46,7 +46,7 @@ rules
   unify: (head, Var(x), local-store*, free-store*) -> (local-store*, new-store*)
     where new-store* := <unify-var> (x, head, free-store*)
 
-  evaluate(|rulls*): (_, Atom("true"), _) -> ("true", [])
+  evaluate(|rulls*): (_, Atom("true"), free-store*) -> ("true", free-store*)
   evaluate(|rulls*): (remainingrules*, Conj(goal1, goal2), store*) -> ("true", store3*)
     where (str, store2*) := <evaluate(|rulls*)> (remainingrules*, goal1, store*);
     	<eq>(str, "true");
@@ -66,13 +66,14 @@ rules
     where (str, new-store*) := <evaluate(|rulls*)> (rulls*, goal, store*);
     	<eq>(str, "true")
   evaluate(|rulls*): (_, Neg(goal), store*) -> ("true", store*)
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (<Fst><evaluate(|rulls*)> (rulls*, subgoal, []), free-store*)
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> <evaluate(|rulls*)> (rulls*, subgoal, free-store*)
     where 
     	<debug>$[Unify args: ];
     	<debug>(head, goal, store*);
     	(local-store*, free-store*) := <unify> (head, goal, [], store*);
-    	<debug>$[Unify result:];
+    	<debug>$[Local store:];
     	<debug>local-store*;
+    	<debug>$[Free store:];
     	<debug>free-store*;
       	subgoal := <substitute>(body, local-store*);
     	<debug>$[Substitute result:];
