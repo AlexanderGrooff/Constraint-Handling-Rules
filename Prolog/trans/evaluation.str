@@ -15,16 +15,7 @@ rules
   	with <debug> $[found value for [x]]
   lookup-store: (x, [_ | store*]) -> <lookup-store> (x, store*)
   
-  substitute: (Atom(x), store*) -> Atom(x)
-  substitute: (Int(x), store*) -> Int(x)
-  substitute: (Float(x), store*) -> Float(x)
-  substitute: (CompoundTerm(x, args*), store*) -> CompoundTerm(x, <substitute-list> (args*, store*))
-  substitute: (Var(x), store*) -> <lookup-store> (x, store*)
-  substitute: (String(x), store*) -> String(x)
-  substitute: (Conj(a, b), store*) -> Conj(<substitute> (a, store*), <substitute> (b, store*))
-  substitute: (Disj(a, b), store*) -> Disj(<substitute> (a, store*), <substitute> (b, store*))
-  substitute-list: ([], store*) -> []
-  substitute-list: ([arg | args*], store*) -> [<substitute> (arg, store*) | <substitute-list> (args*, store*)]
+  substitute(|store*): Var(x) -> <lookup-store> (x, store*)
   
   unify-var: (x, value, store*) -> store*
     where <fetch(?(x, found))> store*;
@@ -55,7 +46,6 @@ rules
       	(str2, store3*) := <evaluate(|rulls*)> (rulls*, goal2, store2*);
       	<eq>(str2, "true")
   evaluate(|rulls*): ([Rule(_, _) | remainingrules*], Conj(goal1, goal2), store*) -> <evaluate(|rulls*)> (remainingrules*, Conj(goal1, goal2), store*)
-//evaluate(|rulls*): (_, Conj(goal1, goal2), store*) -> ("false", store*)
   evaluate(|rulls*): (_, Disj(goal1, goal2), store*) -> ("true", store2*)
     where (str, store2*) := <evaluate(|rulls*)> (rulls*, goal1, store*);
     	<eq>(str, "true")
@@ -76,9 +66,10 @@ rules
     	<debug>local-store*;
     	<debug>$[Free store:];
     	<debug>free-store*;
-      	subgoal := <substitute>(body, local-store*);
+      	subgoal := <topdown(try(substitute(|local-store*)))> body;
     	<debug>$[Substitute result:];
-    	<debug>subgoal
+    	<debug>subgoal//;
+    	//(_, free-store2*) := <evaluate(|rulls*)> (rulls*, subgoal, free-store*)
   evaluate(|rulls*): ([Rule(_, _) | remainingrules*], goal, store*) -> <evaluate(|rulls*)> (remainingrules*, goal, store*)
   evaluate(|rulls*): ([], _, store*) -> ("false", store*)
 
