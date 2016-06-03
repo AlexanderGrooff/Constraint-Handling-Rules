@@ -10,10 +10,12 @@ rules
   args-unify: ([], [], local-store*, free-store*) -> (local-store*, free-store*)
   
   lookup-store: (x, []) -> Var(x)
-  	with <debug> $[var [x] not found]
+//	with <debug> $[var [x] not found]
   lookup-store: (x, [(x, val) | store*]) -> val
-  	with <debug> $[found value for [x]]
+//	with <debug> $[found value for [x]]
   lookup-store: (x, [_ | store*]) -> <lookup-store> (x, store*)
+  
+  make-unique(|uid): Var(x) -> Var((uid, x))
   
   substitute(|store*): Var(x) -> <lookup-store> (x, store*)
   
@@ -22,10 +24,10 @@ rules
   unify-var: (x, value, store*) -> store*
     where <fetch(?(x, found))> store*;
           <eq> (found, value)
-  	with <debug> $[Previous definition of [x] found with same value]
+//	with <debug> $[Previous definition of [x] found with same value]
   unify-var: (x, value, store*) -> [(x, value) |store*]
     where <not(fetch(?(x, _)))> store*
-  	with <debug> $[No previous definition found of [x]]
+//	with <debug> $[No previous definition found of [x]]
 
   unify: (Atom(x), Atom(x), local-store*, free-store*) -> (local-store*, free-store*)
   unify: (Int(x), Int(x), local-store*, free-store*) -> (local-store*, free-store*)
@@ -61,14 +63,16 @@ rules
   evaluate(|rulls*): (_, Neg(goal), store*) -> ("true", store*)
   evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal, store*) -> (r, <conc> (<substitute-all(|free-store2*)> free-store*, free-store2*))
     where 
+    	uid := <new>;
+    	(u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
     	<debug>$[Unify args: ];
-    	<debug>(head, goal, store*);
-    	(local-store*, free-store*) := <unify> (head, goal, [], store*);
+    	<debug>(u-head, goal, store*);
+    	(local-store*, free-store*) := <unify> (u-head, goal, [], store*);
     	<debug>$[Local store:];
     	<debug>local-store*;
     	<debug>$[Free store:];
     	<debug>free-store*;
-      	subgoal := <substitute-all(|local-store*)> body;
+      	subgoal := <substitute-all(|local-store*)> u-body;
     	<debug>$[Substitute result:];
     	<debug>subgoal;
     	(r, free-store2*) := <evaluate(|rulls*)> (rulls*, subgoal, []);
