@@ -22,6 +22,7 @@ rules
   substitute: (Var(x), store*) -> <lookup-store> (x, store*)
   substitute: (String(x), store*) -> String(x)
   substitute: (Conj(a, b), store*) -> Conj(<substitute> (a, store*), <substitute> (b, store*))
+  substitute: (Disj(a, b), store*) -> Disj(<substitute> (a, store*), <substitute> (b, store*))
   substitute-list: ([], store*) -> []
   substitute-list: ([arg | args*], store*) -> [<substitute> (arg, store*) | <substitute-list> (args*, store*)]
   
