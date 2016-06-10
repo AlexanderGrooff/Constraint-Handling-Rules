@@ -21,6 +21,13 @@ rules
   
   substitute-all(|store*) = topdown(try(substitute(|store*)))
   
+  is-var: Var(x) -> Var(x)
+  is-var: x -> x
+  	where <is-string> x <+ <Hd> x
+  
+  unify-var: (x, value, store*) -> [(x, value), (x, found) | store*]
+  	where <fetch(?(x, found))> store*;
+  		<is-var> found
   unify-var: (x, value, store*) -> store*
     where <fetch(?(x, found))> store*;
           <eq> (found, value)
