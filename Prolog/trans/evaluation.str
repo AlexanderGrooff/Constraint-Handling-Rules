@@ -4,6 +4,10 @@ imports
   src-gen/signatures/-
   desugar
 
+signature
+  constructors
+    Result: STRING * List -> Result
+
 rules
   args-unify: ([arg1|args1*], [arg2|args2*], local-store*, free-store*) -> <args-unify> (args1*, args2*, local-store2*, free-store2*)
     where (local-store2*, free-store2*) := <unify> (arg1, arg2, local-store*, free-store*)
@@ -47,45 +51,45 @@ rules
   unify: (head, Var(x), local-store*, free-store*) -> (local-store*, new-store*)
     where new-store* := <unify-var> (x, head, free-store*)
 
-  evaluate(|rulls*): (_, Atom("true")) -> ("true", [])
-  evaluate(|rulls*): (remainingrules*, Conj(goal1, goal2)) -> ("true", <conc> (store*, store2*))
-    where (str, store*) := <evaluate(|rulls*)> (remainingrules*, goal1);
-    	<eq>(str, "true");
-    	<debug> $[Evaluating second part of Conj];
-      	(str2, store2*) := <evaluate(|rulls*)> (rulls*, <substitute-all(|store*)> goal2);
-      	<eq>(str2, "true")
+  evaluate(|rulls*): (_, Atom("true")) -> Result("true", [])
+  evaluate(|rulls*): (remainingrules*, Conj(goal1, goal2)) -> Result("true", <conc> (store*, store2*))
+    where Result(str, store*) := <evaluate(|rulls*)> (remainingrules*, goal1);
+          <eq>(str, "true");
+          <debug> $[Evaluating second part of Conj];
+          Result(str2, store2*) := <evaluate(|rulls*)> (rulls*, <substitute-all(|store*)> goal2);
+          <eq>(str2, "true")
   evaluate(|rulls*): ([Rule(_, _) | remainingrules*], Conj(goal1, goal2)) -> <evaluate(|rulls*)> (remainingrules*, Conj(goal1, goal2))
-  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> ("true", store*)
-    where (str, store*) := <evaluate(|rulls*)> (rulls*, goal1);
-    	<eq>(str, "true")
-  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> ("true", store*)
-    where (str, store*) := <evaluate(|rulls*)> (rulls*, goal2);
-    	<eq>(str, "true")
-  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> ("false", [])
-  evaluate(|rulls*): (_, Neg(goal)) -> ("false", store*)
-    where (str, store*) := <evaluate(|rulls*)> (rulls*, goal);
-    	<eq>(str, "true")
-  evaluate(|rulls*): (_, Neg(goal)) -> ("true", [])
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> (r, <conc> (<substitute-all(|free-store2*)> free-store*, free-store2*))
+  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> Result("true", store*)
+    where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal1);
+          <eq>(str, "true")
+  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> Result("true", store*)
+    where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal2);
+          <eq>(str, "true")
+  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> Result("false", [])
+  evaluate(|rulls*): (_, Neg(goal)) -> Result("false", store*)
+    where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal);
+          <eq>(str, "true")
+  evaluate(|rulls*): (_, Neg(goal)) -> Result("true", [])
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, <conc> (<substitute-all(|free-store2*)> free-store*, free-store2*))
     where 
-    	uid := <new>;
-    	(u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
-    	<debug>$[Unify args: ];
-    	<debug>(u-head, goal);
-    	(local-store*, free-store*) := <unify> (u-head, goal, [], []);
-    	<debug>$[Local store:];
-    	<debug>local-store*;
-    	<debug>$[Free store:];
-    	<debug>free-store*;
-      	subgoal := <substitute-all(|local-store*)> u-body;
-    	<debug>$[Substitute result:];
-    	<debug>subgoal;
-    	(r, free-store2*) := <evaluate(|rulls*)> (rulls*, subgoal);
-    	<debug>$[Free store 2:];
-    	<debug>free-store2*
+      uid := <new>;
+      (u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
+      <debug>$[Unify args: ];
+      <debug>(u-head, goal);
+      (local-store*, free-store*) := <unify> (u-head, goal, [], []);
+      <debug>$[Local store:];
+      <debug>local-store*;
+      <debug>$[Free store:];
+      <debug>free-store*;
+      subgoal := <substitute-all(|local-store*)> u-body;
+      <debug>$[Substitute result:];
+      <debug>subgoal;
+      Result(r, free-store2*) := <evaluate(|rulls*)> (rulls*, subgoal);
+      <debug>$[Free store 2:];
+      <debug>free-store2*
   evaluate(|rulls*): ([Rule(_, _) | remainingrules*], goal) -> <evaluate(|rulls*)> (remainingrules*, goal)
-  evaluate(|rulls*): ([], _) -> ("false", [])
+  evaluate(|rulls*): ([], _) -> Result("false", [])
 
   evaluate-full: (rulls*, Query(goal)) -> <evaluate(|desugared-rules*)> (desugared-rules*, <desugar-all> goal)
   	with
-  		desugared-rules* := <desugar-all> rulls*
+      desugared-rules* := <desugar-all> rulls*
