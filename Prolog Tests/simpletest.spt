@@ -15,12 +15,17 @@ test simple wildcard [[
 	?- a(Y, Z).
 ]] run evaluate-full to Result("true", [("Y", Int("1"))])
 
-test mixed local and free variables [[
-	a(F1, F1, F2) :- b(F1, F2).
-	b(1,1).
+test simple local binding [[
+	a(X).
 	
-	?- a(G1, G2, G2).
-]] run evaluate-full to Result("true", _) // true
+	?- a(b).
+]] run evaluate-full to Result("true", [])
+
+test simple free binding [[
+	a(b).
+	
+	?- a(X).
+]] run evaluate-full to Result("true", [("X", Atom("b"))])
 
 test bad mixed local and free variables [[
 	a(F1, F1, F2) :- b(F1, F2).
