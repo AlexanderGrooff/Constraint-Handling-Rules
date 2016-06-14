@@ -24,6 +24,7 @@ context-free syntax
 	Basic.Float            = FLOAT
 	Basic.String           = STRING
 	Basic.Var              = VARID
+	Basic.Wildcard         = <_>
 	Basic.List             = <[<{Term ", "}+>]>
 	Basic.ListCon          = <[<Term> | <Term>]>
 	Basic.ListNil          = <[]>

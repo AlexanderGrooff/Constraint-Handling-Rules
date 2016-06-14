@@ -2,6 +2,19 @@ module simpletest
 
 language Prolog
 
+test very simple [[
+	cat(tom) :- true.
+	
+	?- cat(tom).
+]] run evaluate-full to Result("true", [])
+
+test simple wildcard [[
+	a(_X, _) :- b(_X).
+	b(1).
+	
+	?- a(Y, Z).
+]] run evaluate-full to Result("true", [("Y", Int("1"))])
+
 test mixed local and free variables [[
 	a(F1, F1, F2) :- b(F1, F2).
 	b(1,1).
@@ -15,9 +28,3 @@ test bad mixed local and free variables [[
 	
 	?- a(G1, G2, G2).
 ]] run evaluate-full to Result("false", _) // false
-
-test very simple [[
-	cat(tom) :- true.
-	
-	?- cat(tom).
-]] run evaluate-full to Result("true", [])

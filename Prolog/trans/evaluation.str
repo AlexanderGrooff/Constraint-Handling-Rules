@@ -46,6 +46,8 @@ rules
   unify: (ListCon(head1, tail1), ListCon(head2, tail2), local-store*, free-store*) -> <unify> (tail1, tail2, local-store2*, free-store2*)
     where (local-store2*, free-store2*) := <unify> (head1, head2, local-store*, free-store*)
   unify: (ListNil(), ListNil(), local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (Wildcard(), _, local-store*, free-store*) -> (local-store*, free-store*)
+  unify: (_, Wildcard(), local-store*, free-store*) -> (local-store*, free-store*)
   unify: (Var(x), goal, local-store*, free-store*) -> (new-store*, free-store*)
     where new-store* := <unify-var> (x, goal, local-store*)
   unify: (head, Var(x), local-store*, free-store*) -> (local-store*, new-store*)
