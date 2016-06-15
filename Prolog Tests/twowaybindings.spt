@@ -29,7 +29,7 @@ test same local variable reversed [[
 	?- a(b, Y).
 ]] run evaluate-full to Result("true", [("Y", Atom("b"))])
 
-test same local variable resolved [[
+test same local variable resolved later [[
 	a(X, X) :- b(X).
 	b(c).
 	
@@ -48,7 +48,7 @@ test same free variable reversed [[
 	?- a(X, X).
 ]] run evaluate-full to Result("true", [("X", Atom("b"))])
 
-test same free variable resolved [[
+test same free variable resolved later [[
 	a(Y, Z) :- b(Z, Y).
 	b(1, 2).
 	b(2, 1).
@@ -79,3 +79,51 @@ test single outer binding [[
 	
 	?- a(b(Y)).
 ]] run evaluate-full to Result("true", [("Y", Atom("d"))])
+
+test same local inner variable [[
+	a(b(Z), b(Z)).
+	
+	?- a(Y, b(1)).
+]] run evaluate-full to Result("true", [("Y", CompoundTerm("b", [Int("1")]))])
+
+test same local inner variable reversed [[
+	a(b(Z), b(Z)).
+	
+	?- a(b(1), Y).
+]] run evaluate-full to Result("true", [("Y", CompoundTerm("b", [Int("1")]))])
+
+test same free inner variable [[
+	a(b(1), b(Z)).
+	
+	?- a(Y, Y).
+]] run evaluate-full to Result("true", [("Y", CompoundTerm("b", [Int("1")]))])
+
+test same free inner variable reversed [[
+	a(b(Z), b(1)).
+	
+	?- a(Y, Y).
+]] run evaluate-full to Result("true", [("Y", CompoundTerm("b", [Int("1")]))])
+
+test same local outer variable [[
+	a(Z, Z).
+	
+	?- a(b(1), b(Y)).
+]] run evaluate-full to Result("true", [("Y", Int("1"))])
+
+test same local outer variable reversed [[
+	a(Z, Z).
+	
+	?- a(b(Y), b(1)).
+]] run evaluate-full to Result("true", [("Y", Int("1"))])
+
+test same free outer variable [[
+	a(b(1), Z).
+	
+	?- a(b(Y), b(Y)).
+]] run evaluate-full to Result("true", [("Y", Int("1"))])
+
+test same free outer variable reversed [[
+	a(Z, b(1)).
+	
+	?- a(b(Y), b(Y)).
+]] run evaluate-full to Result("true", [("Y", Int("1"))])
