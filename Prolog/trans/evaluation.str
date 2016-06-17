@@ -7,6 +7,7 @@ imports
 signature
   constructors
     Result: STRING * List -> Result
+    Unbounded: STRING -> Unbounded
 
 rules
   args-unify: ([arg1|args1*], [arg2|args2*], local-store*, free-store*) -> <args-unify> (args1*, args2*, local-store2*, free-store2*)
@@ -34,6 +35,11 @@ rules
   unify-var: (x, value, store*) -> [(x, value) |store*]
     where <not(fetch(?(x, _)))> store*
 //	with <debug> $[No previous definition found of [x]]
+
+  preserve: CompoundTerm(_, args*) -> <mapconcat(preserve)> args*
+  preserve: ListCon(head, tail) -> <conc> (<preserve> head, <preserve> tail)
+  preserve: Var(x) -> [Unbounded(x)]
+  preserve: _ -> []
 
   unify: (x, x, local-store*, free-store*) -> (local-store*, free-store*)
   unify: (Atom(x), String(x), local-store*, free-store*) -> (local-store*, free-store*)
@@ -74,6 +80,7 @@ rules
       (u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
       <debug>$[Unify args: ];
       <debug>(u-head, goal);
+      preserve-store* := <preserve> goal;
       (local-store*, free-store*) := <unify> (u-head, goal, [], []);
       <debug>$[Local store:];
       <debug>local-store*;
