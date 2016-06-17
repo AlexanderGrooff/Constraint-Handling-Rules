@@ -1,0 +1,29 @@
+module conjunctions
+
+language Prolog
+
+test family example [[
+	mother_child(trude, sally).
+
+	father_child(tom, sally).
+	father_child(tom, erica).
+	father_child(mike, tom).
+
+	sibling(X, Y)      :- parent_child(Z, X), parent_child(Z, Y).
+
+	parent_child(X, Y) :- father_child(X, Y).
+	parent_child(X, Y) :- mother_child(X, Y).
+
+	?- sibling(sally, erica).
+]] run evaluate-full to Result("true", [])
+
+test three conjunction [[
+	a(1).
+	b(1).
+	a(2)
+	c(3).
+	a(3).
+	b(3).
+
+	?- a(Z), b(Z), c(Z).
+]] run evaluate-full to Result("true", [Binding("Z", Int("3"))])
