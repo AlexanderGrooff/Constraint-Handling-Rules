@@ -13,7 +13,7 @@ test simple wildcard [[
 	b(1).
 	
 	?- a(Y, Z).
-]] run evaluate-full to Result("true", [("Y", Int("1"))])
+]] run evaluate-full to Result("true", [Binding("Y", Int("1")), Unbounded("Z")])
 
 test simple local binding [[
 	a(X).
