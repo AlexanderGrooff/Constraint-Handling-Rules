@@ -8,12 +8,9 @@ signature
   constructors
     Result: STRING * List -> Result
     Unbounded: STRING -> Unbounded
+    Binding: STRING * Definable -> Binding
 
 rules
-  args-unify: ([arg1|args1*], [arg2|args2*], local-store*, free-store*) -> <args-unify> (args1*, args2*, local-store2*, free-store2*)
-    where (local-store2*, free-store2*) := <unify> (arg1, arg2, local-store*, free-store*)
-  args-unify: ([], [], local-store*, free-store*) -> (local-store*, free-store*)
-  
   lookup-store: (x, []) -> Var(x)
 //	with <debug> $[var [x] not found]
   lookup-store: (x, [(x, val) | store*]) -> val
@@ -22,45 +19,45 @@ rules
   
   make-unique(|uid): Var(x) -> Var((uid, x))
   
-  substitute(|store*): Var(x) -> <lookup-store> (x, store*)
+  substitute(|x, term): Var(x) -> term
   
-  substitute-all(|store*) = topdown(try(substitute(|store*)))
-  
-  unify-var: (x, value, store*) -> [(x, value), (x, found) | store*]
-  	where <fetch(?(x, Var(found)))> store*
-  unify-var: (x, value, store*) -> store*
-    where <fetch(?(x, found))> store*;
-          <eq> (found, value)
-//	with <debug> $[Previous definition of [x] found with same value]
-  unify-var: (x, value, store*) -> [(x, value) |store*]
-    where <not(fetch(?(x, _)))> store*
-//	with <debug> $[No previous definition found of [x]]
+  substitute-all: (body, [Binding(x, term) | store*], preserve-store*) -> <substitute-all> (body2, store3*, preserve-store3*)
+    where (body2, store2*, preserve-store2*) := <topdown(try(substitute(|x, term)))> (body, store*, preserve-store*);
+          store3* := <conc> (<filter(not(?Binding(x, _)))> store2*, <search-duplicate(|x, term)> store2*);
+          preserve-store3* := <map(try(preserve(|x, term)))> preserve-store2*
+  substitute-all: (body, [], preserve-store*) -> (body, preserve-store*)
 
-  preserve: CompoundTerm(_, args*) -> <mapconcat(preserve)> args*
-  preserve: ListCon(head, tail) -> <conc> (<preserve> head, <preserve> tail)
-  preserve: Var(x) -> [Unbounded(x)]
-  preserve: _ -> []
+  substitute-all-conj: (body, [Binding(x, term) | store*]) -> <substitute-all-conj> (<topdown(try(substitute(|x, term)))> body, store*)
+  substitute-all-conj: (body, []) -> body
 
-  unify: (x, x, local-store*, free-store*) -> (local-store*, free-store*)
-  unify: (Atom(x), String(x), local-store*, free-store*) -> (local-store*, free-store*)
-  unify: (String(x), Atom(x), local-store*, free-store*) -> (local-store*, free-store*)
-  unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*), local-store*, free-store*) -> <args-unify> (args1*, args2*, local-store*, free-store*)
+  search-duplicate(|x, term1): [Binding(x, term2) | store*] -> <conc> (<unify> (term1, term2), <search-duplicate(|x, term1)> store*)
+  search-duplicate(|x, term1): [Binding(y, _) | store*] -> <search-duplicate(|x, term1)> store*
+  search-duplicate(|x, term1): [] -> []
+
+  preserve(|x, term): Unbounded(x) -> Binding(x, term)
+
+  preserve-goal: CompoundTerm(_, args*) -> <mapconcat(preserve-goal)> args*
+  preserve-goal: ListCon(head, tail) -> <conc> (<preserve-goal> head, <preserve-goal> tail)
+  preserve-goal: Var(x) -> [Unbounded(x)]
+  preserve-goal: _ -> []
+
+  unify: (x, x) -> []
+  unify: (Atom(x), String(x)) -> []
+  unify: (String(x), Atom(x)) -> []
+  unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*)) -> <zip; mapconcat(unify)> (args1*, args2*)
     where <eq>(<length> args1*, <length> args2*)
-  unify: (ListCon(head1, tail1), ListCon(head2, tail2), local-store*, free-store*) -> <unify> (tail1, tail2, local-store2*, free-store2*)
-    where (local-store2*, free-store2*) := <unify> (head1, head2, local-store*, free-store*)
-  unify: (Wildcard(), _, local-store*, free-store*) -> (local-store*, free-store*)
-  unify: (_, Wildcard(), local-store*, free-store*) -> (local-store*, free-store*)
-  unify: (Var(x), goal, local-store*, free-store*) -> (new-store*, free-store*)
-    where new-store* := <unify-var> (x, goal, local-store*)
-  unify: (head, Var(x), local-store*, free-store*) -> (local-store*, new-store*)
-    where new-store* := <unify-var> (x, head, free-store*)
+  unify: (ListCon(head1, tail1), ListCon(head2, tail2), local-store*, free-store*) -> <conc> (<unify> (head1, head2), <unify> (tail1, tail2))
+  unify: (Wildcard(), _) -> []
+  unify: (_, Wildcard()) -> []
+  unify: (Var(x), goal) -> [Binding(x, goal)]
+  unify: (head, Var(x)) -> [Binding(x, head)]
 
   evaluate(|rulls*): (_, Atom("true")) -> Result("true", [])
   evaluate(|rulls*): (remainingrules*, Conj(goal1, goal2)) -> Result("true", <conc> (store*, store2*))
     where Result(str, store*) := <evaluate(|rulls*)> (remainingrules*, goal1);
           <eq>(str, "true");
           <debug> $[Evaluating second part of Conj];
-          Result(str2, store2*) := <evaluate(|rulls*)> (rulls*, <substitute-all(|store*)> goal2);
+          Result(str2, store2*) := <evaluate(|rulls*)> (rulls*, <substitute-all-conj> (goal2, store*));
           <eq>(str2, "true")
   evaluate(|rulls*): ([Rule(_, _) | remainingrules*], Conj(goal1, goal2)) -> <evaluate(|rulls*)> (remainingrules*, Conj(goal1, goal2))
   evaluate(|rulls*): (_, Disj(goal1, goal2)) -> Result("true", store*)
@@ -74,24 +71,26 @@ rules
     where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal);
           <eq>(str, "true")
   evaluate(|rulls*): (_, Neg(goal)) -> Result("true", [])
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, <conc> (<substitute-all(|free-store2*)> free-store*, free-store2*))
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, <conc> (preserve-store2*, preserve-store3*))
     where 
       uid := <new>;
       (u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
       <debug>$[Unify args: ];
       <debug>(u-head, goal);
-      preserve-store* := <preserve> goal;
-      (local-store*, free-store*) := <unify> (u-head, goal, [], []);
-      <debug>$[Local store:];
-      <debug>local-store*;
-      <debug>$[Free store:];
-      <debug>free-store*;
-      subgoal := <substitute-all(|local-store*)> u-body;
+      preserve-store* := <preserve-goal> goal;
+      store* := <unify> (u-head, goal);
+      <debug>$[Store:];
+      <debug>store*;
+      <debug>$[Preserve store:];
+      <debug>preserve-store*;
+      (subgoal, preserve-store2*) := <substitute-all> (u-body, store*, preserve-store*);
+      <debug>$[Preserve store 2:];
+      <debug>preserve-store2*;
       <debug>$[Substitute result:];
       <debug>subgoal;
-      Result(r, free-store2*) := <evaluate(|rulls*)> (rulls*, subgoal);
-      <debug>$[Free store 2:];
-      <debug>free-store2*
+      Result(r, preserve-store3*) := <evaluate(|rulls*)> (rulls*, subgoal);
+      <debug>$[Preserve store 3:];
+      <debug>preserve-store3*
   evaluate(|rulls*): ([Rule(_, _) | remainingrules*], goal) -> <evaluate(|rulls*)> (remainingrules*, goal)
   evaluate(|rulls*): ([], _) -> Result("false", [])
 
