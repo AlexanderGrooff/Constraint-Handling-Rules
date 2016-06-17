@@ -32,14 +32,19 @@ rules
 
   search-duplicate(|x, term1): [Binding(x, term2) | store*] -> <conc> (<unify> (term1, term2), <search-duplicate(|x, term1)> store*)
   search-duplicate(|x, term1): [Binding(y, _) | store*] -> <search-duplicate(|x, term1)> store*
+    where <not(eq)> (x, y)
   search-duplicate(|x, term1): [] -> []
 
   preserve(|x, term): Unbounded(x) -> Binding(x, term)
 
-  preserve-goal: CompoundTerm(_, args*) -> <mapconcat(preserve-goal)> args*
-  preserve-goal: ListCon(head, tail) -> <conc> (<preserve-goal> head, <preserve-goal> tail)
-  preserve-goal: Var(x) -> [Unbounded(x)]
-  preserve-goal: _ -> []
+  preserve-goal: (CompoundTerm(_, args*), store*) -> <preserve-goal> (args*, store*)
+  preserve-goal: ([arg | args*], store*) -> <preserve-goal> (args*, store2*)
+    where store2* := <preserve-goal> (arg, store*)
+  preserve-goal: (ListCon(head, tail), store*) -> <preserve-goal> (tail, store2*)
+    where store2* := <preserve-goal> (head, store*)
+  preserve-goal: (Var(x), store*) -> [Unbounded(x) | store*]
+    where <not(fetch(?Unbounded(x)))> store*
+  preserve-goal: (_, store*) -> store*
 
   unify: (x, x) -> []
   unify: (Atom(x), String(x)) -> []
@@ -71,13 +76,13 @@ rules
     where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal);
           <eq>(str, "true")
   evaluate(|rulls*): (_, Neg(goal)) -> Result("true", [])
-  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, <conc> (preserve-store2*, preserve-store3*))
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, preserve-store3*)
     where 
       uid := <new>;
       (u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
       <debug>$[Unify args: ];
       <debug>(u-head, goal);
-      preserve-store* := <preserve-goal> goal;
+      preserve-store* := <preserve-goal> (goal, []);
       store* := <unify> (u-head, goal);
       <debug>$[Store:];
       <debug>store*;
@@ -88,9 +93,10 @@ rules
       <debug>preserve-store2*;
       <debug>$[Substitute result:];
       <debug>subgoal;
-      Result(r, preserve-store3*) := <evaluate(|rulls*)> (rulls*, subgoal);
-      <debug>$[Preserve store 3:];
-      <debug>preserve-store3*
+      Result(r, result-store*) := <evaluate(|rulls*)> (rulls*, subgoal);
+      <debug>$[Result store:];
+      <debug>result-store*;
+      (_, preserve-store3*) := <substitute-all> ((), result-store*, preserve-store2*)
   evaluate(|rulls*): ([Rule(_, _) | remainingrules*], goal) -> <evaluate(|rulls*)> (remainingrules*, goal)
   evaluate(|rulls*): ([], _) -> Result("false", [])
 
