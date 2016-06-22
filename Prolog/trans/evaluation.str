@@ -82,7 +82,7 @@ rules
       (u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
       <debug>$[Unify args: ];
       <debug>(u-head, goal);
-      preserve-store* := <preserve-goal> (goal, []);
+      preserve-store* := <preserve-goal; reverse> (goal, []);
       store* := <unify> (u-head, goal);
       <debug>$[Store:];
       <debug>store*;
