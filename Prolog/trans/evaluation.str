@@ -51,7 +51,7 @@ rules
   unify: (String(x), Atom(x)) -> []
   unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*)) -> <zip; mapconcat(unify)> (args1*, args2*)
     where <eq>(<length> args1*, <length> args2*)
-  unify: (ListCon(head1, tail1), ListCon(head2, tail2), local-store*, free-store*) -> <conc> (<unify> (head1, head2), <unify> (tail1, tail2))
+  unify: (ListCon(head1, tail1), ListCon(head2, tail2)) -> <conc> (<unify> (head1, head2), <unify> (tail1, tail2))
   unify: (Wildcard(), _) -> []
   unify: (_, Wildcard()) -> []
   unify: (Var(x), goal) -> [Binding(x, goal)]
