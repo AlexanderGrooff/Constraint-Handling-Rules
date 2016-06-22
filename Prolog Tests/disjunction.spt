@@ -1,0 +1,34 @@
+module disjunction
+
+language Prolog
+
+test simple disjunction [[
+	a :- b;c.
+	b.
+	?- a.
+]] run evaluate-full to Result("true", [])
+
+test simple false disjunction [[
+	a :- b;c.
+	b.
+	c.
+	?- d.
+]] run evaluate-full to Result("false", [])
+
+test triple disjunction [[
+	d :- a;b;c.
+	c.
+	?- d.
+]] run evaluate-full to Result("true", [])
+
+test disjunction has equal precedence to conjunction [[
+	a :- b,c ; d.
+	d.
+	?- a.
+]] run evaluate-full to Result("false", [])
+
+test disjunction has equal precedence to conjunction 2 [[
+	a :- b;c,d.
+	b.
+	?- a.
+]] run evaluate-full to Result("true", [])
