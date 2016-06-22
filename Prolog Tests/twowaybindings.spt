@@ -71,7 +71,7 @@ test single inner binding [[
 	c(d).
 	
 	?- a(Y).
-]] run evaluate-full to Result("true", [Binding("Y", ComoundTerm("b", [Atom("d")]))])
+]] run evaluate-full to Result("true", [Binding("Y", CompoundTerm("b", [Atom("d")]))])
 
 test single outer binding [[
 	a(Z) :- c(Z).
