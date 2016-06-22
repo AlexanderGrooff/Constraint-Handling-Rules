@@ -25,10 +25,22 @@ test disjunction has equal precedence to conjunction [[
 	a :- b,c ; d.
 	d.
 	?- a.
-]] run evaluate-full to Result("false", [])
+]] run evaluate-full to Result("true", [])
 
 test disjunction has equal precedence to conjunction 2 [[
 	a :- b;c,d.
 	b.
+	?- a.
+]] run evaluate-full to Result("true", [])
+
+test disjunction forced precedence over conjunction [[
+	a :- b,(c;d).
+	d.
+	?- a.
+]] run evaluate-full to Result("false", [])
+
+test conjunction forced precedence over conjunction [[
+	a :- (b,c);d.
+	d.
 	?- a.
 ]] run evaluate-full to Result("true", [])
