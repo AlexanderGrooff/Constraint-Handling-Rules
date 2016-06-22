@@ -2,6 +2,19 @@ module conjunctions
 
 language Prolog
 
+test simple conjunction [[
+	a :- b, c.
+	b.
+	c.
+	?- a.
+]] run evaluate-full to Result("true", [])
+
+test simple false conjunction [[
+	a :- b,c .
+	b.
+	?- a.
+]] run evaluate-full to Result("false", [])
+
 test family example [[
 	mother_child(trude, sally).
 
@@ -18,12 +31,27 @@ test family example [[
 ]] run evaluate-full to Result("true", [])
 
 test three conjunction [[
-	a(1).
-	b(1).
-	a(2)
-	c(3).
 	a(3).
 	b(3).
-
+	c(3).
 	?- a(Z), b(Z), c(Z).
 ]] run evaluate-full to Result("true", [Binding("Z", Int("3"))])
+
+test conjunction query [[
+	a.
+	b.
+	?- a,b.
+]] run evaluate-full to Result("true", [])
+
+test conjunction local variable binding [[
+	b(1, 0). 
+	c(0, 1).
+	?- b(X, Y), c(Y, X).
+]] run evaluate-full to Result("true", [Binding("X", Int("1")), Binding("Y", Int("0"))])
+
+test conjunction should have no conflicting local variables [[
+	a :- c(X, X).
+	b(1, 1).
+	c(0, 0).
+	?- a, b(X, X).
+]] run evaluate-full to Result("true", [Binding("X", Int("1"))])
