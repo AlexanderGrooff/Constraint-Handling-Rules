@@ -39,7 +39,7 @@ test disjunction forced precedence over conjunction [[
 	?- a.
 ]] run evaluate-full to Result("false", [])
 
-test conjunction forced precedence over conjunction [[
+test conjunction forced precedence over disjunction [[
 	a :- (b,c);d.
 	d.
 	?- a.
