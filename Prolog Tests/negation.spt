@@ -1,0 +1,23 @@
+module negation
+
+language Prolog
+
+test simple negation [[
+	a :- \+ true.
+	?- a.
+]] run evaluate-full to Result("false", [])
+
+test negation on conjunction [[
+	a :- \+ true, true.
+	?- a.
+]] run evaluate-full to Result("false", [])
+
+test negation has precedence over conjunction [[
+	a :- \+ false, true.
+	?- a.
+]] run evaluate-full to Result("true", [])
+
+test negation on disjunction [[
+	a :- \+ true; true.
+	?- a.
+]] run evaluate-full to Result("true", [])
