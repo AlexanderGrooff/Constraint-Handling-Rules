@@ -15,7 +15,7 @@ context-free syntax
 	Callable.Conj          = <<Callable>, <Callable>>
 	Callable.Disj          = <<Callable>; <Callable>>
 	Callable.Neg           = <\\+ <Callable>>
-	Callable.Unify         = <<Definable> = <Definable>>
+	Callable.Unify         = <<Term> = <Term>>
 	Callable               = <(<Callable>)> {bracket}
 
 	Definable.Atom         = ATOMID
