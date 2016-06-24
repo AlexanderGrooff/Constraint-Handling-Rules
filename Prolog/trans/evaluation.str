@@ -42,6 +42,8 @@ rules
     where store2* := <preserve-goal> (arg, store*)
   preserve-goal: (ListCon(head, tail), store*) -> <preserve-goal> (tail, store2*)
     where store2* := <preserve-goal> (head, store*)
+  preserve-goal: Unify(term1, term2) -> <preserve-goal> (term2, store*)
+    where store* := <preserve-goal> (term1, [])
   preserve-goal: (Var(x), store*) -> [Unbounded(x) | store*]
     where <not(fetch(?Unbounded(x)))> store*
   preserve-goal: (_, store*) -> store*
@@ -76,6 +78,11 @@ rules
     where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal);
           <eq>(str, "true")
   evaluate(|rulls*): (_, Neg(goal)) -> Result("true", [])
+  evaluate(|rulls*): (_, Unify(term1, term2)) -> Result("true", preserve-store2*)
+    where preserve-store* := <preserve-goal; reverse> (Unify(term1, term2), []);
+          store* := <unify> (term1, term2);
+          (_, preserve-store2*) := <substitute-all> ((), store*, preserve-store*)
+  evaluate(|rulls*): (_, Unify(term1, term2)) -> Result("false", [])
   evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, preserve-store3*)
     where 
       uid := <new>;

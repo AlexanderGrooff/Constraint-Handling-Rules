@@ -11,7 +11,7 @@ context-free start-symbols
 
 context-free syntax
 
-	Start          = <<{Statement "\n"}+>
+	Start          = <<{Statement "\n"}*>
 
 <Query>>
 	Statement.Rule = <<Definable> :- <Callable>.>
