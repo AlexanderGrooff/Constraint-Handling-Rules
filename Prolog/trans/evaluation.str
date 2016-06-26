@@ -89,6 +89,8 @@ rules
           <debug>preserve-store*;
           (_, preserve-store2*) := <substitute-all> ((), store*, preserve-store*)
   evaluate(|rulls*): (_, Unify(term1, term2)) -> Result("false", [])
+  evaluate(|rulls*): (_, Atom("false")) -> Result("false", [])
+  evaluate(|rulls*): (_, Atom("fail")) -> Result("false", [])
   evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, preserve-store3*)
     where 
       uid := <new>;
