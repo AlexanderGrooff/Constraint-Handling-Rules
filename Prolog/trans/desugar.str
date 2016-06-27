@@ -5,6 +5,9 @@ imports
 
 rules
   desugar: Fact(t) -> Rule(t, Atom("true"))
+  desugar: NoUnify(t1, t2) -> Neg(Unify(t1, t2))
+  desugar: NEq(t1, t2) -> Neg(Eq(t1, t2))
+  desugar: Is(t1, t2) -> CompoundTerm("is", [t1, t2])
   desugar: List([e | es*]) -> ListCon(e, List(es*))
   desugar: List([]) -> ListNil()
 
