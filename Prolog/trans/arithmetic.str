@@ -24,6 +24,9 @@ rules
 
   arithmetic: Int(_) -> <id>
   arithmetic: Float(_) -> <id>
+  arithmetic: ArithBinOp(DivOp(), e1, e2) -> Float(<arith-float-bin; real-to-string> (DivOp(), <string-to-real> i1, <string-to-real> i2))
+    where (Int(i1), Int(i2)) := (<arithmetic> e1, <arithmetic> e2);
+          <not(eq)> (<modi> (<string-to-int> i1, <string-to-int> i2), 0)
   arithmetic: ArithBinOp(o, e1, e2) -> Int(<arith-int-bin; int-to-string> (o, <string-to-int> i1, <string-to-int> i2))
     where (Int(i1), Int(i2)) := (<arithmetic> e1, <arithmetic> e2)
   arithmetic: ArithBinOp(o, e1, e2) -> Float(<arith-float-bin; real-to-string> (o, <string-to-real> f, <string-to-real> i))
