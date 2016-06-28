@@ -105,6 +105,18 @@ rules
   evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
     where (Float(f1), Float(f2)) := (<arithmetic> e1, <arithmetic> e2);
           <comp-bin> (o, <string-to-real> f1, <string-to-real> f2)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("false", [])
+  evaluate(|rulls*): (_, CompoundTerm("is", [term, e])) -> Result("true", preserve-store2*)
+    where <debug>$[Is args: ];
+          <debug>(term, e);
+          preserve-store* := <preserve-goal; reverse> (term, []);
+          store* := <unify> (term, <arithmetic> e);
+          <debug>$[Store:];
+          <debug>store*;
+          <debug>$[Preserve store:];
+          <debug>preserve-store*;
+          (_, preserve-store2*) := <substitute-all> ((), store*, preserve-store*)
+  evaluate(|rulls*): (_, CompoundTerm("is", [term, e])) -> Result("false", [])
   evaluate(|rulls*): (_, Atom("false")) -> Result("false", [])
   evaluate(|rulls*): (_, Atom("fail")) -> Result("false", [])
   evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, preserve-store3*)
