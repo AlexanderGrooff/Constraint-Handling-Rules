@@ -59,6 +59,34 @@ rules
   unify: (Var(x), goal) -> [Binding(x, goal)]
   unify: (head, Var(x)) -> [Binding(x, head)]
 
+  arith-int-bin: (AddOp(), i1, i2) -> <addi> (i1, i2)
+  arith-int-bin: (SubOp(), i1, i2) -> <subti> (i1, i2)
+  arith-int-bin: (MultOp(), i1, i2) -> <muli> (i1, i2)
+  arith-int-bin: (DivOp(), i1, i2) -> <divi> (i1, i2)
+
+  arith-float-bin: (AddOp(), f1, f2) -> <addr> (f1, f2)
+  arith-float-bin: (SubOp(), f1, f2) -> <subtr> (f1, f2)
+  arith-float-bin: (MultOp(), f1, f2) -> <mulr> (f1, f2)
+  arith-float-bin: (DivOp(), f1, f2) -> <divr> (f1, f2)
+
+  comp-bin: (NumEqOp(), i1, i2) -> <eq> (i1, i2)
+  comp-bin: (NumNEqOp(), i1, i2) -> <not(eq)> (i1, i2)
+  comp-bin: (LtOp(), i1, i2) -> <lt> (i1, i2)
+  comp-bin: (GtOp(), i1, i2) -> <gt> (i1, i2)
+  comp-bin: (LtEOp(), i1, i2) -> <leq> (i1, i2)
+  comp-bin: (GtEOp(), i1, i2) -> <geq> (i1, i2)
+
+  arithmetic: Int(_) -> <id>
+  arithmetic: Float(_) -> <id>
+  arithmetic: ArithBinOp(o, e1, e2) -> Int(<arith-int-bin; int-to-string> (o, <string-to-int> i1, <string-to-int> i2))
+    where (Int(i1), Int(i2)) := (<arithmetic> e1, <arithmetic> e2)
+  arithmetic: ArithBinOp(o, e1, e2) -> Float(<arith-float-bin; real-to-string> (o, <string-to-real> f, <string-to-real> i))
+    where (Float(f), Int(i)) := (<arithmetic> e1, <arithmetic> e2)
+  arithmetic: ArithBinOp(o, e1, e2) -> Float(<arith-float-bin; real-to-string> (o, <string-to-real> i, <string-to-real> f))
+    where (Int(i), Float(f)) := (<arithmetic> e1, <arithmetic> e2)
+  arithmetic: ArithBinOp(o, e1, e2) -> Float(<arith-float-bin; real-to-string> (o, <string-to-real> f1, <string-to-real> f2))
+    where (Float(f1), Float(f2)) := (<arithmetic> e1, <arithmetic> e2)
+
   evaluate(|rulls*): (_, Atom("true")) -> Result("true", [])
   evaluate(|rulls*): (remainingrules*, Conj(goal1, goal2)) -> Result("true", <conc> (store*, store2*))
     where Result(str, store*) := <evaluate(|rulls*)> (remainingrules*, goal1);
@@ -89,6 +117,20 @@ rules
           <debug>preserve-store*;
           (_, preserve-store2*) := <substitute-all> ((), store*, preserve-store*)
   evaluate(|rulls*): (_, Unify(term1, term2)) -> Result("false", [])
+  evaluate(|rulls*): (_, Eq(term, term)) -> Result("true", [])
+  evaluate(|rulls*): (_, Eq(_, _)) -> Result("false", [])
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Int(i1), Int(i2)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-int> i1, <string-to-int> i2)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Float(f), Int(i)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-real> f, <string-to-real> i)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Int(i), Float(f)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-real> i, <string-to-real> f)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Float(f1), Float(f2)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-real> f1, <string-to-real> f2)
   evaluate(|rulls*): (_, Atom("false")) -> Result("false", [])
   evaluate(|rulls*): (_, Atom("fail")) -> Result("false", [])
   evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, preserve-store3*)
