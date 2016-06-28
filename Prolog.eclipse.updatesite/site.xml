@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/Prolog.eclipse.feature_0.4.3.qualifier.jar" id="Prolog.eclipse.feature" version="0.4.3.qualifier">
+      <category name="Prolog_Language_Editor"/>
+   </feature>
+   <category-def name="Prolog_Language_Editor" label="Prolog Language Editor">
+      <description>
+         The editor for the Prolog language.
+      </description>
+   </category-def>
+</site>
