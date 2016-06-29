@@ -22,6 +22,12 @@ rules // Editor Services
       filename := <guarantee-extension(|"evaluated.aterm")> path
     ; text     := <evaluate-full> selected
 
+  editor-evaluate-format:
+    (selected, position, ast, path, project-path) -> (filename, text)
+    where
+      filename := <guarantee-extension(|"evaluated.pl")> path
+    ; text     := <evaluate-full; pp-Prolog-Result-string> selected
+
 rules // Debugging
   
   debug-show-aterm:

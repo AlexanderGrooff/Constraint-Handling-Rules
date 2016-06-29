@@ -17,6 +17,7 @@ menus
     action: "Show analyzed AST" = debug-show-analyzed
     action: "Desugar" = editor-desugar
     action: "Evaluate" = editor-evaluate
+    action: "Evaluate & Format" = editor-evaluate-format
 
     submenu: "Show analysis"
       action: "Project"   = debug-project

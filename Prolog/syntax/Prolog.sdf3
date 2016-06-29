@@ -8,12 +8,21 @@ imports
 context-free start-symbols
 
 	Start
+	Result
 
 context-free syntax
 
-	Start          = <<{Statement "\n"}*>
+	Start           = <<{Statement "\n"}*>
 
 <Query>>
-	Statement.Rule = <<Definable> :- <Callable>.>
-	Statement.Fact = <<Definable>.>
-	Query.Query    = <?- <Callable>.>
+
+	Result.Result   = <<Answer>.
+
+<{Binding ", "}*>.>
+
+	Statement.Rule  = <<Definable> :- <Callable>.>
+	Statement.Fact  = <<Definable>.>
+	Query.Query     = <?- <Callable>.>
+
+	Answer          = ATOMID
+	Binding.Binding = <<VARID> = <Term>>

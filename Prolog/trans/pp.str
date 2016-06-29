@@ -30,6 +30,12 @@ rules
     ; !V([], <id>)
     ; box2text-string(|120)
       
+  pp-Prolog-Result-string =
+    parenthesize-Prolog
+    ; prettyprint-Result
+    ; !V([], <id>)
+    ; box2text-string(|120)
+      
   pp-debug :
     ast -> result
     with
