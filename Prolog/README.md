@@ -1,3 +1,17 @@
+# Implementation details
+
+This Prolog implementation solves a given Prolog query `?- <...>.` given zero or many facts `<...>.`, and/or horn clauses `<...> :- <...>.`. It answers `true` or `false`, along with variable equalities, if found in the form `X1 = <...>,...,Xn = <...>`.
+
+## Syntax
+
+The solver requires an input file in the form: `Statement* Query`, where:
+```
+Statement ::= <Definable> :- <Callable>.
+Statement ::= <Definable>.
+Query ::= ?- <Callable>.
+```
+The relation between `Definable` and `Callable` is a strict inclusion, such that `Callable ::= Definable`, but not reversed.
+
 # Future Work
 
 ## Disjunction Answers
