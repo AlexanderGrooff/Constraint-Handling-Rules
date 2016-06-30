@@ -10,7 +10,15 @@ Statement ::= <Definable> :- <Callable>.
 Statement ::= <Definable>.
 Query ::= ?- <Callable>.
 ```
-The relation between `Definable` and `Callable` is a strict inclusion, such that `Callable ::= Definable`, but not reversed.
+The relation between `Definable` and `Callable` is a strict inclusion, such that `Callable ::= Definable` (`Definable` is a subset of `Callable`), but not reversed. `Definable` can only be rewritten to a Prolog atom and a Compound Term with one or many `Term`s as arguments. `Callable` additionally allows:
+* Conjunction of 2 `Callable`s `,/2`
+* Disjunction of 2 `Callable`s `;/2`
+* Negation of 1 `Callable` `\+/1`
+* Explicit Unification of 2 `Term`s `=/2`
+* Term equality `==/2`
+* Arithmetic comparisons
+* `is/2` evaluations
+`Callable` does not allow basic expressions such as numbers, strings, arithmetic expressions and variables. Only the `Term` can be rewritten to those syntactic elements.
 
 # Future Work
 
