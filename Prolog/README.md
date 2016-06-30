@@ -1,6 +1,6 @@
 # Future Work
 
-# Disjunction Answers
+## Disjunction Answers
 
 An important feature which has not yet been implemented is the possibility of disjunction in answers. This should occur when a query evaluates to `true` and there are multiple possible assignments to the free (query) variables. An example:
 ```
