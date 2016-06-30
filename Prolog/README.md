@@ -20,6 +20,12 @@ The relation between `Definable` and `Callable` is a strict inclusion, such that
 * `is/2` evaluations
 `Callable` does not allow basic expressions such as numbers, strings, arithmetic expressions and variables. Only the `Term` can be rewritten to those syntactic elements.
 
+## Transformation Strategies
+
+`trans/evaluation.str` contains the most important Stratego strategies for solving Prolog queries. The `<evaluate-full>` strategy takes the `Statement`s and query, desugars them and then delegate the solving to the `<evaluate>` strategy.
+The `<evaluate>` strategy loops over all `Statement`s in the knowledge base and tries to succeed the following: First `<unify>` the query with the left-hand side of the horn-clause. Then `<substitute-all>` on the right-hand side of the horn-clause. Recursively apply `<evaluate>` and return its result. For conjunctions `,/2`, disjunctions `;/2`, and negations `\+/1` special rewrite rules are followed. When `<evaluate>` finds one of the operators `=/2`, `==/2`, one of the arithmetic comparisons, or `is/2`, the knowledge base is not consulted, but instead the operation is invoked using Stratego. The `=/2`, for example simply applies `<unify>` to both ends of the operator, then checks for consistency using `<substitute-all>`.
+The `<unify>` strategy succeeds only when the two given terms are unifyable. It also returns a list of equalities of the Prolog variables it found. `<unify>` recursively applies to inner terms of lists and compound terms. `<unify>` with at least one variable and some other term always succeeds by returning the equality between that variable and that term. `<unify>` with two identical terms also succeeds.
+
 # Future Work
 
 ## Disjunction Answers
