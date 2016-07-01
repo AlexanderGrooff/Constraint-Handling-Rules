@@ -1,0 +1,3 @@
+( [Rule(CompoundTerm("cat", [Atom("tom")]), Atom("true"))]
+, Query(Fact(CompoundTerm("cat", [Atom("x")])))
+)

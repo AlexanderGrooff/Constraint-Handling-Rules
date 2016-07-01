@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Prolog language Eclipse plugin
+Bundle-SymbolicName: Prolog.eclipse;singleton:=true
+Bundle-Version: 0.4.3.qualifier
+Bundle-Vendor: metaborg.org
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.metaborg.spoofax.eclipse
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

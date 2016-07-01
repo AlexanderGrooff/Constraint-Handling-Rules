@@ -1,0 +1,55 @@
+module Atom
+
+imports 
+	Common
+
+context-free start-symbols
+	Term
+
+context-free syntax
+	Term                   = Definable
+	Term                   = Basic
+//	Term                   = <(<Term>)> {bracket}
+
+	Callable               = Definable
+	Callable.Conj          = <<Callable>, <Callable>>
+	Callable.Disj          = <<Callable>; <Callable>>
+	Callable.Neg           = <\\+ <Callable>>
+	Callable.Unify         = <<Term> = <Term>>
+	Callable.NoUnify       = <<Term> \\= <Term>>
+	Callable.Eq            = <<Term> == <Term>>
+	Callable.NEq           = <<Term> \\== <Term>>
+	Callable.NumEq         = <<Term> =:= <Term>>
+	Callable.NumNEq        = <<Term> =\\= <Term>>
+	Callable.Lt            = <<Term> \< <Term>>
+	Callable.Gt            = <<Term> \> <Term>>
+	Callable.LtE           = <<Term> =\< <Term>>
+	Callable.GtE           = <<Term> \>= <Term>>
+	Callable.Is            = <<Term> is <Term>>
+	Callable               = <(<Callable>)> {bracket}
+
+	Definable.Atom         = ATOMID
+	Definable.CompoundTerm = <<ATOMID>(<{Term ", "}+>)>
+
+	Basic.Int              = INT
+	Basic.Float            = FLOAT
+	Basic.String           = STRING
+	Basic.Var              = VARID
+	Basic.Wildcard         = <_>
+	Basic.List             = <[<{Term ", "}+>]>
+	Basic.ListCon          = <[<Term> | <Term>]>
+	Basic.ListNil          = <[]>
+	Basic.Add              = <<Basic> + <Basic>>
+	Basic.Sub              = <<Basic> - <Basic>>
+	Basic.Mult             = <<Basic> * <Basic>>
+	Basic.Div              = <<Basic> / <Basic>>
+	Basic.Pow              = <<Basic> ^ <Basic>>
+	Basic                  = <(<Basic>)> {bracket}
+
+context-free priorities
+	{right: Basic.Pow} >
+	{left: Basic.Mult Basic.Div} >
+	{left: Basic.Add Basic.Sub} >
+	{right: Callable.Neg} >
+	{left: Callable.Conj} >
+	{left: Callable.Disj}

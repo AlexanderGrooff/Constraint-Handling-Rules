@@ -1,0 +1,51 @@
+module unification
+
+language Prolog
+
+test simple unification [[
+	?- a = a.
+]] run evaluate-full to Result("true", [])
+
+test fail unification [[
+	?- a = b.
+]] run evaluate-full to Result("false", [])
+
+test left unification [[
+	?- X = a.
+]] run evaluate-full to Result("true", [Binding("X", Atom("a"))])
+
+test left unification check [[
+	a(1).
+
+	?- X = 1, a(X).
+]] run evaluate-full to Result("true", [Binding("X", Int("1"))])
+
+test left unification fail [[
+	a(2).
+
+	?- X = 1, a(X).
+]] run evaluate-full to Result("false", [])
+
+test right unification [[
+	?- a = X.
+]] run evaluate-full to Result("true", [Binding("X", Atom("a"))])
+
+test right unification check [[
+	a(1).
+
+	?- 1 = X, a(X).
+]] run evaluate-full to Result("true", [Binding("X", Int("1"))])
+
+test right unification fail [[
+	a(2).
+
+	?- 1 = X, a(X).
+]] run evaluate-full to Result("false", [])
+
+test inner left unification [[
+	?- a(X) = a(1).
+]] run evaluate-full to Result("true", [Binding("X", Int("1"))])
+
+test inner right unification [[
+	?- a(1) = a(X).
+]] run evaluate-full to Result("true", [Binding("X", Int("1"))])

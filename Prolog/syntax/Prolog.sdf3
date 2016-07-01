@@ -1,0 +1,28 @@
+module Prolog
+
+imports
+
+	Atom
+	Common
+
+context-free start-symbols
+
+	Start
+	Result
+
+context-free syntax
+
+	Start           = <<{Statement "\n"}*>
+
+<Query>>
+
+	Result.Result   = <<Answer>.
+
+<{Binding ", "}*>.>
+
+	Statement.Rule  = <<Definable> :- <Callable>.>
+	Statement.Fact  = <<Definable>.>
+	Query.Query     = <?- <Callable>.>
+
+	Answer          = ATOMID
+	Binding.Binding = <<VARID> = <Term>>

@@ -1,0 +1,37 @@
+module prolog
+
+imports
+  
+  completion
+  pp
+  outline
+  analysis
+  desugar
+  evaluation
+
+rules // Editor Services
+  editor-desugar:
+    (selected, position, ast, path, project-path) -> (filename, text)
+    where
+      filename := <guarantee-extension(|"desugared.aterm")> path
+    ; text     := <desugar-all> selected
+
+  editor-evaluate:
+    (selected, position, ast, path, project-path) -> (filename, text)
+    where
+      filename := <guarantee-extension(|"evaluated.aterm")> path
+    ; text     := <evaluate-full> selected
+
+  editor-evaluate-format:
+    (selected, position, ast, path, project-path) -> (filename, text)
+    where
+      filename := <guarantee-extension(|"evaluated.pl")> path
+    ; text     := <evaluate-full; pp-Prolog-Result-string> selected
+
+rules // Debugging
+  
+  debug-show-aterm:
+    (node, _, _, path, project-path) -> (filename, result)
+    with
+      filename := <guarantee-extension(|"aterm")> path
+    ; result   := node

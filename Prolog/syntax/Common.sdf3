@@ -1,0 +1,53 @@
+module Common
+
+lexical syntax
+
+  ATOMID         = [a-z] [a-zA-Z0-9\_]* 
+  ATOMID         = "'" AtomStringChar* "'" 
+  VARID          = [A-Z] [a-zA-Z0-9\_]* 
+  VARID          = "_" [a-zA-Z0-9\_]+ 
+  INT            = "-"? [0-9]+ 
+  FLOAT          = "-"? [0-9]+"."[0-9]+
+  STRING         = "\"" StringChar* "\"" 
+  AtomStringChar = ~[\'\n] 
+  AtomStringChar = "\\'" 
+  AtomStringChar = BackSlashChar 
+  StringChar     = ~[\"\n] 
+  StringChar     = "\\\"" 
+  StringChar     = BackSlashChar 
+  BackSlashChar  = "\\" 
+  LAYOUT         = [\ \t\n\r] 
+  CommentChar    = [\*] 
+  LAYOUT         = "/*" InsideComment* "*/" 
+  InsideComment  = ~[\*] 
+  InsideComment  = CommentChar 
+  LAYOUT         = "//" ~[\n\r]* NewLineEOF 
+  NewLineEOF     = [\n\r] 
+  NewLineEOF     = EOF 
+  EOF            =  
+
+lexical restrictions
+
+  // Ensure greedy matching for lexicals
+  
+  CommentChar   -/- [\/]
+  INT           -/- [0-9]
+  FLOAT         -/- [0-9]
+  ATOMID        -/- [a-zA-Z0-9\_]
+  VARID         -/- [a-zA-Z0-9\_]
+  
+  // EOF may not be followed by any char
+  
+  EOF           -/- ~[]
+  
+  // Backslash chars in strings may not be followed by " 
+  
+  BackSlashChar -/- [\"]
+
+context-free restrictions
+
+  // Ensure greedy matching for comments
+  
+  LAYOUT? -/- [\ \t\n\r]
+  LAYOUT? -/- [\/].[\/]
+  LAYOUT? -/- [\/].[\*]

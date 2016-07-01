@@ -1,0 +1,47 @@
+module desugar
+
+imports
+  src-gen/signatures/-
+
+signature
+  sorts
+    ArithOp
+    CompOp
+//  Basic
+//  Callable
+  constructors
+    ArithBinOp : ArithOp * Basic * Basic -> Basic
+    CompBinOp  : CompOp * Basic * Basic -> Callable
+    AddOp      : ArithOp
+    SubOp      : ArithOp
+    MultOp     : ArithOp
+    DivOp      : ArithOp
+    PowOp      : ArithOp
+    NumEqOp    : CompOp
+    NumNEqOp   : CompOp
+    LtOp       : CompOp
+    GtOp       : CompOp
+    LtEOp      : CompOp
+    GtEOp      : CompOp
+
+rules
+  desugar: Fact(t) -> Rule(t, Atom("true"))
+  desugar: NoUnify(t1, t2) -> Neg(Unify(t1, t2))
+  desugar: NEq(t1, t2) -> Neg(Eq(t1, t2))
+  desugar: Is(t1, t2) -> CompoundTerm("is", [t1, t2])
+  desugar: List([e | es*]) -> ListCon(e, List(es*))
+  desugar: List([]) -> ListNil()
+  desugar: NumEq(t1, t2) -> CompBinOp(NumEqOp(), t1, t2)
+  desugar: NumNEq(t1, t2) -> CompBinOp(NumNEqOp(), t1, t2)
+  desugar: Lt(t1, t2) -> CompBinOp(LtOp(), t1, t2)
+  desugar: Gt(t1, t2) -> CompBinOp(GtOp(), t1, t2)
+  desugar: LtE(t1, t2) -> CompBinOp(LtEOp(), t1, t2)
+  desugar: GtE(t1, t2) -> CompBinOp(GtEOp(), t1, t2)
+  desugar: Add(t1, t2) -> ArithBinOp(AddOp(), t1, t2)
+  desugar: Sub(t1, t2) -> ArithBinOp(SubOp(), t1, t2)
+  desugar: Mult(t1, t2) -> ArithBinOp(MultOp(), t1, t2)
+  desugar: Div(t1, t2) -> ArithBinOp(DivOp(), t1, t2)
+  desugar: Pow(t1, t2) -> ArithBinOp(PowOp(), t1, t2)
+
+strategies
+  desugar-all = topdown(try(desugar))

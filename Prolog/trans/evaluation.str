@@ -1,0 +1,148 @@
+module evaluation
+
+imports
+  src-gen/signatures/-
+  desugar
+  arithmetic
+
+signature
+  constructors
+    Result: STRING * List -> Result
+    Unbounded: STRING -> Unbounded
+    Binding: STRING * Definable -> Binding
+
+rules
+  lookup-store: (x, []) -> Var(x)
+//	with <debug> $[var [x] not found]
+  lookup-store: (x, [(x, val) | store*]) -> val
+//	with <debug> $[found value for [x]]
+  lookup-store: (x, [_ | store*]) -> <lookup-store> (x, store*)
+  
+  make-unique(|uid): Var(x) -> Var((uid, x))
+  
+  substitute(|x, term): Var(x) -> term
+  
+  substitute-all: (body, [Binding(x, term) | store*], preserve-store*) -> <substitute-all> (body2, store3*, preserve-store3*)
+    where (body2, store2*, preserve-store2*) := <topdown(try(substitute(|x, term)))> (body, store*, preserve-store*);
+          store3* := <conc> (<filter(not(?Binding(x, _)))> store2*, <search-duplicate(|x, term)> store2*);
+          preserve-store3* := <map(try(preserve(|x, term)))> preserve-store2*
+  substitute-all: (body, [], preserve-store*) -> (body, preserve-store*)
+
+  substitute-all-conj: (body, [Binding(x, term) | store*]) -> <substitute-all-conj> (<topdown(try(substitute(|x, term)))> body, store*)
+  substitute-all-conj: (body, []) -> body
+
+  search-duplicate(|x, term1): [Binding(x, term2) | store*] -> <conc> (<unify> (term1, term2), <search-duplicate(|x, term1)> store*)
+  search-duplicate(|x, term1): [Binding(y, _) | store*] -> <search-duplicate(|x, term1)> store*
+    where <not(eq)> (x, y)
+  search-duplicate(|x, term1): [] -> []
+
+  preserve(|x, term): Unbounded(x) -> Binding(x, term)
+
+  preserve-goal: (CompoundTerm(_, args*), store*) -> <preserve-goal> (args*, store*)
+  preserve-goal: ([arg | args*], store*) -> <preserve-goal> (args*, store2*)
+    where store2* := <preserve-goal> (arg, store*)
+  preserve-goal: (ListCon(head, tail), store*) -> <preserve-goal> (tail, store2*)
+    where store2* := <preserve-goal> (head, store*)
+  preserve-goal: (Unify(term1, term2), store*) -> <preserve-goal> (term2, store2*)
+    where store2* := <preserve-goal> (term1, [])
+  preserve-goal: (Var(x), store*) -> [Unbounded(x) | store*]
+    where <not(fetch(?Unbounded(x)))> store*
+  preserve-goal: (_, store*) -> store*
+
+  unify: (x, x) -> []
+  unify: (Atom(x), String(x)) -> []
+  unify: (String(x), Atom(x)) -> []
+  unify: (CompoundTerm(x, args1*), CompoundTerm(x, args2*)) -> <zip; mapconcat(unify)> (args1*, args2*)
+    where <eq>(<length> args1*, <length> args2*)
+  unify: (ListCon(head1, tail1), ListCon(head2, tail2)) -> <conc> (<unify> (head1, head2), <unify> (tail1, tail2))
+  unify: (Wildcard(), _) -> []
+  unify: (_, Wildcard()) -> []
+  unify: (Var(x), goal) -> [Binding(x, goal)]
+  unify: (head, Var(x)) -> [Binding(x, head)]
+
+
+  evaluate(|rulls*): (_, Atom("true")) -> Result("true", [])
+  evaluate(|rulls*): (remainingrules*, Conj(goal1, goal2)) -> Result("true", <conc> (store*, store2*))
+    where Result(str, store*) := <evaluate(|rulls*)> (remainingrules*, goal1);
+          <eq>(str, "true");
+          <debug> $[Evaluating second part of Conj];
+          Result(str2, store2*) := <evaluate(|rulls*)> (rulls*, <substitute-all-conj> (goal2, store*));
+          <eq>(str2, "true")
+  evaluate(|rulls*): ([Rule(_, _) | remainingrules*], Conj(goal1, goal2)) -> <evaluate(|rulls*)> (remainingrules*, Conj(goal1, goal2))
+  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> Result("true", store*)
+    where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal1);
+          <eq>(str, "true")
+  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> Result("true", store*)
+    where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal2);
+          <eq>(str, "true")
+  evaluate(|rulls*): (_, Disj(goal1, goal2)) -> Result("false", [])
+  evaluate(|rulls*): (_, Neg(goal)) -> Result("false", store*)
+    where Result(str, store*) := <evaluate(|rulls*)> (rulls*, goal);
+          <eq>(str, "true")
+  evaluate(|rulls*): (_, Neg(goal)) -> Result("true", [])
+  evaluate(|rulls*): (_, Unify(term1, term2)) -> Result("true", preserve-store2*)
+    where <debug>$[Unify args: ];
+          <debug>(term1, term2);
+          preserve-store* := <preserve-goal; reverse> (Unify(term1, term2), []);
+          store* := <unify> (term1, term2);
+          <debug>$[Store:];
+          <debug>store*;
+          <debug>$[Preserve store:];
+          <debug>preserve-store*;
+          (_, preserve-store2*) := <substitute-all> ((), store*, preserve-store*)
+  evaluate(|rulls*): (_, Unify(term1, term2)) -> Result("false", [])
+  evaluate(|rulls*): (_, Eq(term, term)) -> Result("true", [])
+  evaluate(|rulls*): (_, Eq(_, _)) -> Result("false", [])
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Int(i1), Int(i2)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-int> i1, <string-to-int> i2)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Float(f), Int(i)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-real> f, <string-to-real> i)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Int(i), Float(f)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-real> i, <string-to-real> f)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("true", [])
+    where (Float(f1), Float(f2)) := (<arithmetic> e1, <arithmetic> e2);
+          <comp-bin> (o, <string-to-real> f1, <string-to-real> f2)
+  evaluate(|rulls*): (_, CompBinOp(o, e1, e2)) -> Result("false", [])
+  evaluate(|rulls*): (_, CompoundTerm("is", [term, e])) -> Result("true", preserve-store2*)
+    where <debug>$[Is args: ];
+          <debug>(term, e);
+          preserve-store* := <preserve-goal; reverse> (term, []);
+          store* := <unify> (term, <arithmetic> e);
+          <debug>$[Store:];
+          <debug>store*;
+          <debug>$[Preserve store:];
+          <debug>preserve-store*;
+          (_, preserve-store2*) := <substitute-all> ((), store*, preserve-store*)
+  evaluate(|rulls*): (_, CompoundTerm("is", [term, e])) -> Result("false", [])
+  evaluate(|rulls*): (_, Atom("false")) -> Result("false", [])
+  evaluate(|rulls*): (_, Atom("fail")) -> Result("false", [])
+  evaluate(|rulls*): ([Rule(head, body) | remainingrules*], goal) -> Result(r, preserve-store3*)
+    where 
+      uid := <new>;
+      (u-head, u-body) := <topdown(try(make-unique(|uid)))> (head, body);
+      <debug>$[Unify args: ];
+      <debug>(u-head, goal);
+      preserve-store* := <preserve-goal; reverse> (goal, []);
+      store* := <unify> (u-head, goal);
+      <debug>$[Store:];
+      <debug>store*;
+      <debug>$[Preserve store:];
+      <debug>preserve-store*;
+      (subgoal, preserve-store2*) := <substitute-all> (u-body, store*, preserve-store*);
+      <debug>$[Preserve store 2:];
+      <debug>preserve-store2*;
+      <debug>$[Substitute result:];
+      <debug>subgoal;
+      Result(r, result-store*) := <evaluate(|rulls*)> (rulls*, subgoal);
+      <debug>$[Result store:];
+      <debug>result-store*;
+      (_, preserve-store3*) := <substitute-all> ((), result-store*, preserve-store2*)
+  evaluate(|rulls*): ([Rule(_, _) | remainingrules*], goal) -> <evaluate(|rulls*)> (remainingrules*, goal)
+  evaluate(|rulls*): ([], _) -> Result("false", [])
+
+  evaluate-full: (rulls*, Query(goal)) -> <evaluate(|desugared-rules*)> (desugared-rules*, <desugar-all> goal)
+  	with
+      desugared-rules* := <desugar-all> rulls*
